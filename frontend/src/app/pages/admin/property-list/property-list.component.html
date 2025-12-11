@@ -1,0 +1,43 @@
+<div class="admin-container">
+    <div class="header-actions">
+        <h2>Quản lý Tin đăng</h2>
+        <button (click)="goToCreate()" class="btn-create">➕ Thêm tin mới</button>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Hình ảnh</th>
+                <th>Tiêu đề</th>
+                <th>Loại</th>
+                <th>Giá</th>
+                <th>Địa chỉ</th>
+                <th>Người đăng</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let prop of properties">
+                <td>{{ prop.id }}</td>
+                <td>
+                    <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/house-placeholder.jpg'"
+                        class="thumb-img" alt="Property">
+                </td>
+                <td>{{ prop.title }}</td>
+                <td>
+                    <span [class]="prop.type === 'rent' ? 'badge-rent' : 'badge-sale'">
+                        {{ prop.type === 'rent' ? 'Cho thuê' : 'Bán' }}
+                    </span>
+                </td>
+                <td>{{ prop.price | number }} VND</td>
+                <td>{{ prop.address }}</td>
+                <td>{{ prop.user?.fullName }}</td>
+                <td>
+                    <button (click)="editProperty(prop.id!)" class="btn-edit">✏️ Sửa</button>
+                    <button (click)="deleteProperty(prop.id!)" class="btn-delete">🗑️ Xóa</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

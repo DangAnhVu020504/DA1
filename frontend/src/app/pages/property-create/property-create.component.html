@@ -1,0 +1,107 @@
+<div class="create-container">
+    <h2>Đăng Tin Bất Động Sản Mới</h2>
+
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+    <form (ngSubmit)="onSubmit()" #form="ngForm">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Tiêu đề tin *</label>
+                <input type="text" [(ngModel)]="property.title" name="title" required class="form-control"
+                    placeholder="VD: Nhà phố 3 tầng Quận 7">
+            </div>
+        </div>
+
+        <div class="form-row two-columns">
+            <div class="form-group">
+                <label>Loại giao dịch *</label>
+                <select [(ngModel)]="property.listingTypeId" name="listingTypeId" required class="form-control">
+                    <option [ngValue]="null">-- Chọn loại --</option>
+                    <option *ngFor="let lt of listingTypes" [ngValue]="lt.id">{{ lt.name }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Loại BĐS *</label>
+                <select [(ngModel)]="property.typeId" name="typeId" required class="form-control">
+                    <option [ngValue]="null">-- Chọn loại BĐS --</option>
+                    <option *ngFor="let pt of propertyTypes" [ngValue]="pt.id">{{ pt.name }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row two-columns">
+            <div class="form-group">
+                <label>Tỉnh/Thành phố *</label>
+                <select [(ngModel)]="selectedCityId" name="cityId" (ngModelChange)="onCityChange()" required
+                    class="form-control">
+                    <option [ngValue]="null">-- Chọn thành phố --</option>
+                    <option *ngFor="let city of cities" [ngValue]="city.id">{{ city.name }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Quận/Huyện *</label>
+                <select [(ngModel)]="property.districtId" name="districtId" required class="form-control"
+                    [disabled]="!selectedCityId">
+                    <option [ngValue]="null">-- Chọn quận/huyện --</option>
+                    <option *ngFor="let d of districts" [ngValue]="d.id">{{ d.name }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Địa chỉ cụ thể *</label>
+                <input type="text" [(ngModel)]="property.address" name="address" required class="form-control"
+                    placeholder="Số nhà, tên đường">
+            </div>
+        </div>
+
+        <div class="form-row two-columns">
+            <div class="form-group">
+                <label>Mức giá (VND) *</label>
+                <input type="number" [(ngModel)]="property.price" name="price" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Diện tích (m²) *</label>
+                <input type="number" [(ngModel)]="property.area" name="area" required class="form-control">
+            </div>
+        </div>
+
+        <div class="form-row two-columns">
+            <div class="form-group">
+                <label>Số phòng ngủ</label>
+                <input type="number" [(ngModel)]="property.bedrooms" name="bedrooms" class="form-control" min="0">
+            </div>
+
+            <div class="form-group">
+                <label>Số phòng tắm</label>
+                <input type="number" [(ngModel)]="property.bathrooms" name="bathrooms" class="form-control" min="0">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Mô tả chi tiết</label>
+                <textarea [(ngModel)]="property.description" name="description" rows="5" class="form-control"
+                    placeholder="Mô tả chi tiết về bất động sản..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Hình ảnh mô tả</label>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file">
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="submit" [disabled]="!form.valid || loading" class="btn btn-primary">
+                {{ loading ? 'Đang xử lý...' : '📤 Đăng Tin' }}
+            </button>
+            <button type="button" (click)="cancel()" class="btn btn-secondary">Hủy</button>
+        </div>
+    </form>
+</div>

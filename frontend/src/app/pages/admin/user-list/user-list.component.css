@@ -1,0 +1,33 @@
+.user-list-container {
+    padding: 20px;
+}
+
+.btn-add {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.user-table th {
+    background-color: #f2f2f2;
+}
+
+button {
+    margin-right: 5px;
+    cursor: pointer;
+}

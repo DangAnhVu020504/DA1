@@ -1,0 +1,390 @@
+/* ============================================
+   Property Detail Page - Modern Glassmorphism
+   ============================================ */
+
+.detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.back-link:hover {
+    background: white;
+    transform: translateX(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.detail-content {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .detail-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Main Image Section */
+.left-section {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.main-image {
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Info Section */
+.info-section {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    height: fit-content;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+.price {
+    font-size: 1.75rem;
+    color: #dc2626;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.address {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Seller Info */
+.seller-info {
+    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+}
+
+.seller-info h4 {
+    margin: 0 0 15px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.seller-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.seller-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+}
+
+.seller-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.seller-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+    color: #1f2937;
+}
+
+.seller-email,
+.seller-phone {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.seller-phone {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.btn-booking-detail {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn-booking-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+}
+
+/* Description Section */
+.description-section {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 0 0 24px 24px;
+}
+
+.description-section h3 {
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 12px;
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #1f2937;
+    font-size: 1.25rem;
+}
+
+.description {
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: #4b5563;
+}
+
+/* Comments Section */
+.comments-section {
+    margin-top: 30px;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.comments-section h3 {
+    margin: 0 0 20px;
+    color: #1f2937;
+    font-size: 1.25rem;
+}
+
+.comment-form {
+    margin-bottom: 24px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+    margin-bottom: 12px;
+    transition: all 0.3s;
+    background: #f9fafb;
+    box-sizing: border-box;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.comment-form button {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.comment-form button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+.comment-form button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 14px;
+    border: 1px solid #f3f4f6;
+}
+
+.comment-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid #e5e7eb;
+}
+
+.comment-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.comment-author {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.comment-text {
+    margin: 0;
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+.no-comments {
+    color: #9ca3af;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Messages */
+.comment-error {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    color: #b91c1c;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border: 1px solid #fecaca;
+}
+
+.comment-success {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    color: #15803d;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border: 1px solid #bbf7d0;
+}
+
+.login-prompt {
+    padding: 20px;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-radius: 14px;
+    text-align: center;
+    border: 1px solid #bfdbfe;
+}
+
+.login-prompt a {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+
+/* Property details/specs */
+.property-specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.spec-item {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.spec-item span {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.spec-item strong {
+    font-size: 1.1rem;
+    color: #1f2937;
+}

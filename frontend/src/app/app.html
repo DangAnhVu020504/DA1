@@ -1,0 +1,171 @@
+<nav>
+  <a routerLink="/home" class="nav-brand">🏢 BatDongSanVIP</a>
+  <div class="nav-links">
+    <!-- Admin Link -->
+    <a *ngIf="isAdmin$ | async" routerLink="/admin/dashboard" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+      📊 Dashboard
+    </a>
+    <a *ngIf="isAdmin$ | async" routerLink="/admin/users" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+      👥 Người dùng
+    </a>
+    <a *ngIf="isAdmin$ | async" routerLink="/admin/properties" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+      📋 Tin đăng
+    </a>
+    <a *ngIf="isAdmin$ | async" routerLink="/admin/comments" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+      💬 Bình luận
+    </a>
+    <a *ngIf="isAdmin$ | async" routerLink="/admin/appointments" routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+      📅 Lịch hẹn
+    </a>
+
+    <!-- User Logged In -->
+    <div *ngIf="currentUser$ | async as user; else guestNav" class="user-group">
+      <!-- Property Management Link -->
+      <a routerLink="/my-properties" class="property-menu-btn" title="Quản lý BĐS">
+        🏠 Quản lý BDS
+      </a>
+
+      <!-- Notification Bell -->
+      <div class="notification-wrapper">
+        <button class="notification-bell" (click)="toggleNotifications()" title="Thông báo lịch hẹn">
+          🔔
+          <span *ngIf="notificationCount > 0" class="notification-badge">{{ notificationCount }}</span>
+        </button>
+
+        <!-- Notification Dropdown -->
+        <div *ngIf="showNotifications" class="notification-dropdown">
+          <div class="notification-header">
+            <h4>📅 Lịch hẹn của bạn</h4>
+            <button class="close-btn" (click)="closeNotifications()">✕</button>
+          </div>
+          <div class="notification-list">
+            <div *ngIf="notifications.length === 0" class="no-notifications">
+              Chưa có lịch hẹn nào
+            </div>
+            <div *ngFor="let apt of notifications" class="notification-item" [class.pending]="apt.status === 'pending'">
+              <div class="notification-status">
+                <span *ngIf="apt.status === 'pending'" class="status-badge pending">Chờ xác nhận</span>
+                <span *ngIf="apt.status === 'confirmed'" class="status-badge confirmed">Đã xác nhận</span>
+                <span *ngIf="apt.status === 'completed'" class="status-badge completed">Hoàn thành</span>
+              </div>
+              <div class="notification-content">
+                <p class="apt-property">🏠 {{ apt.listing?.property?.title || apt.listing?.title || 'N/A' }}</p>
+                <p class="apt-name">👤 {{ apt.fullName }}</p>
+                <p class="apt-phone">📱 {{ apt.phone }}</p>
+                <p class="apt-date">📅 {{ apt.scheduledAt | date:'dd/MM/yyyy' }}</p>
+                <p *ngIf="apt.message" class="apt-message">💬 {{ apt.message }}</p>
+                <button *ngIf="apt.status === 'pending'" class="btn-confirm" (click)="confirmAppointment(apt.id!)">
+                  ✅ Xác nhận
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <span class="welcome-text">Xin chào, {{ user.fullName }}</span>
+      <a routerLink="/profile" class="avatar-link" title="Hồ sơ">
+        <img [src]="user.avatar ? 'http://localhost:3000' + user.avatar : 'assets/default-avatar.png'"
+          class="nav-avatar" alt="Avatar">
+      </a>
+      <button (click)="logout()" class="btn-logout">🚪 Đăng xuất</button>
+    </div>
+
+    <!-- Guest -->
+    <ng-template #guestNav>
+      <a routerLink="/login" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        📝 Đăng Nhập
+      </a>
+      <a routerLink="/register" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        ✍️ Đăng Ký
+      </a>
+    </ng-template>
+  </div>
+</nav>
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <!-- Top Bar -->
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="brand-icon">🏢</span>
+      <span class="brand-name">BatDongSanVIP</span>
+    </div>
+    <div class="footer-contact-info">
+      <div class="contact-item">
+        <span class="contact-icon">📞</span>
+        <div>
+          <span class="contact-label">Hotline</span>
+          <span class="contact-value">1900 1881</span>
+        </div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">📧</span>
+        <div>
+          <span class="contact-label">Hỗ trợ khách hàng</span>
+          <span class="contact-value">support&#64;bdsvip.com.vn</span>
+        </div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-icon">💬</span>
+        <div>
+          <span class="contact-label">Chăm sóc khách hàng</span>
+          <span class="contact-value">hotro&#64;bdsvip.com.vn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Footer -->
+  <div class="footer-main">
+    <div class="footer-column">
+      <h4>CÔNG TY BĐS VIP VIỆT NAM</h4>
+      <p>📍 Tầng 31, Keangnam Hanoi Landmark Tower, Phường Yên Hòa, Thành phố Hà Nội, Việt Nam</p>
+      <p>📞 (024) 3562 5939 - (024) 3562 5940</p>
+    </div>
+
+    <div class="footer-column">
+      <h4>HƯỚNG DẪN</h4>
+      <a href="#">Về chúng tôi</a>
+      <a href="#">Báo giá và hỗ trợ</a>
+      <a href="#">Câu hỏi thường gặp</a>
+      <a href="#">Góp ý báo lỗi</a>
+      <a href="#">Sitemap</a>
+    </div>
+
+    <div class="footer-column">
+      <h4>QUY ĐỊNH</h4>
+      <a href="#">Quy định đăng tin</a>
+      <a href="#">Quy chế hoạt động</a>
+      <a href="#">Điều khoản thỏa thuận</a>
+      <a href="#">Chính sách bảo mật</a>
+      <a href="#">Giải quyết khiếu nại</a>
+    </div>
+
+    <div class="footer-column">
+      <h4>ĐĂNG KÝ NHẬN TIN</h4>
+      <div class="newsletter">
+        <input type="email" placeholder="Nhập email của bạn">
+        <button>➤</button>
+      </div>
+      <h4 style="margin-top: 20px;">QUỐC GIA & NGÔN NGỮ</h4>
+      <select class="language-select">
+        <option>🌍 Việt Nam</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Copyright -->
+  <div class="footer-bottom">
+    <p>© 2024 BatDongSanVIP. Tất cả quyền được bảo lưu.</p>
+  </div>
+</footer>

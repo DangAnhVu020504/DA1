@@ -1,0 +1,28 @@
+<div class="user-list-container">
+    <h2>Quản lý người dùng</h2>
+    <button (click)="createUser()" class="btn-add">➕ Thêm người dùng mới</button>
+
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên đầy đủ</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let user of users">
+                <td>{{ user.id }}</td>
+                <td>{{ user.fullName }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                    <button (click)="editUser(user.id)">✏️ Sửa</button>
+                    <button (click)="deleteUser(user.id)">🗑️ Xóa</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,80 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-icon">✍️</div>
+      <h1>Đăng Ký</h1>
+      <p>Tạo tài khoản quản lý BDS</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label for="fullName">👤 Họ Tên</label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          placeholder="Nhập họ tên đầy đủ"
+          class="form-input"
+          [class.error]="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched"
+        />
+        <div *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched" class="error-message">
+          ⚠️ Họ tên là bắt buộc
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">📧 Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Nhập email"
+          class="form-input"
+          [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+        />
+        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
+          ⚠️ Vui lòng nhập email hợp lệ
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">🔑 Mật Khẩu</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Tối thiểu 6 ký tự"
+          class="form-input"
+          [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+        />
+        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
+          <span *ngIf="registerForm.get('password')?.errors?.['required']">⚠️ Mật khẩu là bắt buộc</span>
+          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">⚠️ Mật khẩu phải từ 6 ký tự</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">📱 Số Điện Thoại (Tùy Chọn)</label>
+        <input
+          id="phone"
+          type="text"
+          formControlName="phone"
+          placeholder="Nhập số điện thoại"
+          class="form-input"
+        />
+      </div>
+
+      <div *ngIf="errorMsg" class="alert alert-danger">
+        ❌ {{ errorMsg }}
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid" class="btn btn-primary btn-large">
+        Đăng Ký
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Đã có tài khoản? <a routerLink="/login" class="link-highlight">Đăng nhập</a></p>
+    </div>
+  </div>
+</div>

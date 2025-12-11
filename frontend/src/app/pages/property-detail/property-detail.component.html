@@ -1,0 +1,91 @@
+<div class="detail-container">
+    <div *ngIf="loading" class="loading">Đang tải...</div>
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+    <div *ngIf="property" class="property-detail">
+        <a routerLink="/home" class="back-link">← Quay lại danh sách</a>
+
+        <div class="detail-content">
+            <div class="image-section">
+                <img [src]="property.imageUrl ? 'http://localhost:3000' + property.imageUrl : 'assets/house-placeholder.jpg'"
+                    alt="{{ property.title }}" class="main-image">
+            </div>
+
+            <div class="info-section">
+                <h1 class="title">{{ property.title }}</h1>
+                <p class="price">{{ property.price | number }} VND</p>
+                <p class="address">📍 {{ property.address }}</p>
+
+                <div class="seller-info" *ngIf="property.user">
+                    <h3>Thông tin người bán</h3>
+                    <div class="seller-card">
+                        <div class="seller-avatar">
+                            <img [src]="property.user.avatar ? 'http://localhost:3000' + property.user.avatar : 'assets/default-avatar.png'"
+                                alt="Seller">
+                        </div>
+                        <div>
+                            <p class="seller-name">{{ property.user.fullName }}</p>
+                            <p class="seller-email">📧 {{ property.user.email }}</p>
+                            <p class="seller-phone" *ngIf="property.user.phone">📱 {{ property.user.phone }}</p>
+                        </div>
+                    </div>
+                    <button [routerLink]="['/booking', property.id]" class="btn-booking-detail">
+                        📅 Đặt lịch hẹn / Liên hệ
+                    </button>
+                </div>
+
+                <div class="description-section">
+                    <h3>Mô tả chi tiết</h3>
+                    <p class="description">{{ property.description }}</p>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section">
+                    <h3>💬 Bình luận</h3>
+
+                    <!-- Comment form - show different UI based on login status -->
+                    <div class="comment-form">
+                        <div *ngIf="!isLoggedIn()" class="login-prompt">
+                            <p>🔒 <a routerLink="/login">Đăng nhập</a> để bình luận</p>
+                        </div>
+
+                        <div *ngIf="isLoggedIn()">
+                            <textarea [(ngModel)]="newComment" placeholder="Viết bình luận..." rows="3"
+                                [disabled]="submittingComment"></textarea>
+                            <button (click)="submitComment()" [disabled]="!newComment.trim() || submittingComment">
+                                {{ submittingComment ? 'Đang gửi...' : 'Gửi bình luận' }}
+                            </button>
+                        </div>
+
+                        <!-- Error message -->
+                        <div *ngIf="commentError" class="comment-error">
+                            ⚠️ {{ commentError }}
+                        </div>
+
+                        <!-- Success message -->
+                        <div *ngIf="commentSuccess" class="comment-success">
+                            ✅ {{ commentSuccess }}
+                        </div>
+                    </div>
+
+                    <div class="comments-list">
+                        <div *ngFor="let comment of comments" class="comment-item">
+                            <div class="comment-avatar">
+                                <img [src]="comment.user?.avatar ? 'http://localhost:3000' + comment.user.avatar : 'assets/default-avatar.png'"
+                                    alt="Avatar">
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <span class="comment-author">{{ comment.user?.fullName }}</span>
+                                    <span class="comment-date">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                </div>
+                                <p class="comment-text">{{ comment.content }}</p>
+                            </div>
+                        </div>
+                        <p *ngIf="comments.length === 0" class="no-comments">Chưa có bình luận nào.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

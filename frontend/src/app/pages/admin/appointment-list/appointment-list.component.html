@@ -1,0 +1,42 @@
+<div class="admin-list-container">
+    <h2>📅 Quản lý Lịch hẹn</h2>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tin đăng</th>
+                <th>Họ tên</th>
+                <th>Điện thoại</th>
+                <th>Ngày hẹn</th>
+                <th>Lời nhắn</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let apt of appointments">
+                <td>{{ apt.id }}</td>
+                <td>{{ apt.listing?.property?.title || apt.listing?.title || 'N/A' }}</td>
+                <td>{{ apt.fullName }}</td>
+                <td>{{ apt.phone }}</td>
+                <td>{{ apt.scheduledAt | date:'dd/MM/yyyy' }}</td>
+                <td class="message-cell">{{ apt.message || '-' }}</td>
+                <td>
+                    <span class="status-badge" [class]="apt.status">
+                        {{ getStatusLabel(apt.status!) }}
+                    </span>
+                </td>
+                <td class="actions">
+                    <button *ngIf="apt.status === 'pending'" class="btn-confirm" (click)="confirmAppointment(apt.id!)">
+                        ✅ Xác nhận
+                    </button>
+                    <button class="btn-delete" (click)="deleteAppointment(apt.id!)">🗑️ Xóa</button>
+                </td>
+            </tr>
+            <tr *ngIf="appointments.length === 0">
+                <td colspan="8" class="no-data">Chưa có lịch hẹn nào</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

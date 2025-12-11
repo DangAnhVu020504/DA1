@@ -1,0 +1,48 @@
+<div class="form-container">
+    <h2>{{ isEditMode ? 'Sửa tin đăng' : 'Thêm tin đăng mới' }}</h2>
+
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <form (ngSubmit)="saveProperty()" #form="ngForm">
+        <div class="form-group">
+            <label>Tiêu đề *</label>
+            <input type="text" [(ngModel)]="property.title" name="title" required class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Loại hình *</label>
+            <select [(ngModel)]="property.type" name="type" required class="form-control">
+                <option value="sale">🏠 Nhà đất bán</option>
+                <option value="rent">🔑 Nhà đất cho thuê</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Mức giá (VND) *</label>
+            <input type="number" [(ngModel)]="property.price" name="price" required class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Địa chỉ *</label>
+            <input type="text" [(ngModel)]="property.address" name="address" required class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Mô tả chi tiết</label>
+            <textarea [(ngModel)]="property.description" name="description" rows="5" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Hình ảnh</label>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file">
+            <img *ngIf="property.imageUrl" [src]="'http://localhost:3000' + property.imageUrl" class="preview-img">
+        </div>
+
+        <div class="actions">
+            <button type="submit" [disabled]="!form.valid || loading" class="btn-primary">
+                {{ loading ? 'Đang xử lý...' : 'Lưu' }}
+            </button>
+            <button type="button" (click)="cancel()" class="btn-secondary">Hủy</button>
+        </div>
+    </form>
+</div>

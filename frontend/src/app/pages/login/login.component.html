@@ -1,0 +1,53 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-icon">🔐</div>
+      <h1>Đăng Nhập</h1>
+      <p>Quản lý bất động sản của bạn</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label for="email">📧 Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Nhập email của bạn"
+          class="form-input"
+          [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
+        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
+          ⚠️ Vui lòng nhập email hợp lệ
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">🔑 Mật Khẩu</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Nhập mật khẩu"
+          class="form-input"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        />
+        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
+          ⚠️ Mật khẩu là bắt buộc
+        </div>
+      </div>
+
+      <div *ngIf="errorMsg" class="alert alert-danger">
+        ❌ {{ errorMsg }}
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid" class="btn btn-primary btn-large">
+        Đăng Nhập
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Chưa có tài khoản? <a routerLink="/register" class="link-highlight">Đăng ký ngay</a></p>
+    </div>
+  </div>
+</div>

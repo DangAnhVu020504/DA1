@@ -1,0 +1,174 @@
+<div class="my-properties-container">
+    <div class="page-header">
+        <h1>🏠 Quản lý Bất động sản</h1>
+        <button *ngIf="!showForm" class="btn-create" (click)="openCreateForm()">
+            ➕ Tạo BDS mới
+        </button>
+    </div>
+
+    <!-- Inline Form -->
+    <div *ngIf="showForm" class="property-form-container">
+        <div class="form-header">
+            <h2>{{ isEditing ? '✏️ Sửa Bất động sản' : '➕ Tạo BDS mới' }}</h2>
+            <button class="close-form-btn" (click)="closeForm()">✕</button>
+        </div>
+
+        <div *ngIf="formError" class="alert alert-danger">{{ formError }}</div>
+
+        <form (ngSubmit)="onSubmit()" #form="ngForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tiêu đề tin *</label>
+                    <input type="text" [(ngModel)]="property.title" name="title" required class="form-control"
+                        placeholder="VD: Nhà phố 3 tầng Quận 7">
+                </div>
+            </div>
+
+            <div class="form-row two-columns">
+                <div class="form-group">
+                    <label>Loại giao dịch *</label>
+                    <select [(ngModel)]="property.listingTypeId" name="listingTypeId" required class="form-control">
+                        <option [ngValue]="null">-- Chọn loại --</option>
+                        <option *ngFor="let lt of listingTypes" [ngValue]="lt.id">{{ lt.name }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Loại BĐS *</label>
+                    <select [(ngModel)]="property.typeId" name="typeId" required class="form-control">
+                        <option [ngValue]="null">-- Chọn loại BĐS --</option>
+                        <option *ngFor="let pt of propertyTypes" [ngValue]="pt.id">{{ pt.name }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row two-columns">
+                <div class="form-group">
+                    <label>Tỉnh/Thành phố *</label>
+                    <select [(ngModel)]="selectedCityId" name="cityId" (ngModelChange)="onCityChange()" required
+                        class="form-control">
+                        <option [ngValue]="null">-- Chọn thành phố --</option>
+                        <option *ngFor="let city of cities" [ngValue]="city.id">{{ city.name }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Quận/Huyện *</label>
+                    <select [(ngModel)]="property.districtId" name="districtId" required class="form-control"
+                        [disabled]="!selectedCityId">
+                        <option [ngValue]="null">-- Chọn quận/huyện --</option>
+                        <option *ngFor="let d of districts" [ngValue]="d.id">{{ d.name }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Địa chỉ cụ thể *</label>
+                    <input type="text" [(ngModel)]="property.address" name="address" required class="form-control"
+                        placeholder="Số nhà, tên đường">
+                </div>
+            </div>
+
+            <div class="form-row two-columns">
+                <div class="form-group">
+                    <label>Mức giá (VND) *</label>
+                    <input type="number" [(ngModel)]="property.price" name="price" required class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Diện tích (m²) *</label>
+                    <input type="number" [(ngModel)]="property.area" name="area" required class="form-control">
+                </div>
+            </div>
+
+            <div class="form-row two-columns">
+                <div class="form-group">
+                    <label>Số phòng ngủ</label>
+                    <input type="number" [(ngModel)]="property.bedrooms" name="bedrooms" class="form-control" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label>Số phòng tắm</label>
+                    <input type="number" [(ngModel)]="property.bathrooms" name="bathrooms" class="form-control" min="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mô tả chi tiết</label>
+                    <textarea [(ngModel)]="property.description" name="description" rows="4" class="form-control"
+                        placeholder="Mô tả chi tiết về bất động sản..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Hình ảnh mô tả</label>
+                    <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" [disabled]="!form.valid || formLoading" class="btn btn-primary">
+                    {{ formLoading ? 'Đang xử lý...' : (isEditing ? '💾 Lưu thay đổi' : '📤 Tạo BDS') }}
+                </button>
+                <button type="button" (click)="closeForm()" class="btn btn-secondary">Hủy</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Đang tải danh sách...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !showForm && properties.length === 0" class="empty-state">
+        <div class="empty-icon">🏡</div>
+        <h3>Bạn chưa có bất động sản nào</h3>
+        <p>Bắt đầu bằng cách tạo tin đăng mới</p>
+        <button class="btn-create-large" (click)="openCreateForm()">
+            ➕ Tạo BDS đầu tiên
+        </button>
+    </div>
+
+    <!-- Property Grid -->
+    <div *ngIf="!loading && !showForm && properties.length > 0" class="property-grid">
+        <div *ngFor="let prop of properties" class="property-card">
+            <div class="property-image">
+                <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/default-property.jpg'"
+                    alt="property">
+                <span class="status-badge" [class]="prop.status">
+                    {{ getStatusLabel(prop.status!) }}
+                </span>
+            </div>
+
+            <div class="property-content">
+                <h3 class="property-title">{{ prop.title }}</h3>
+                <p class="property-address">📍 {{ prop.address }}</p>
+                <p class="property-price">💰 {{ prop.price | number }} VNĐ</p>
+
+                <div class="property-meta">
+                    <span *ngIf="prop.bedrooms">🛏️ {{ prop.bedrooms }} PN</span>
+                    <span *ngIf="prop.bathrooms">🚿 {{ prop.bathrooms }} WC</span>
+                    <span *ngIf="prop.area">📐 {{ prop.area }} m²</span>
+                </div>
+            </div>
+
+            <div class="property-actions">
+                <button class="btn-action btn-edit" (click)="openEditForm(prop)" title="Sửa">
+                    ✏️ Sửa
+                </button>
+                <button class="btn-action btn-delete" (click)="deleteProperty(prop.id!)" title="Xóa">
+                    🗑️ Xóa
+                </button>
+                <button class="btn-action btn-publish" (click)="publishProperty(prop.id!)"
+                    [disabled]="prop.status === 'available'" title="Đăng tin">
+                    📢 Đăng tin
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

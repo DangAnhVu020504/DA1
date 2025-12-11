@@ -1,0 +1,42 @@
+<div class="user-form-container">
+    <h2>{{ isEditMode ? 'Sửa thông tin người dùng' : 'Thêm người dùng mới' }}</h2>
+
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+    <form (ngSubmit)="saveUser()" #form="ngForm">
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" [(ngModel)]="user.email" name="email" required [disabled]="isEditMode">
+        </div>
+
+        <div class="form-group" *ngIf="!isEditMode"> <!-- Only show password for new users for simplicity -->
+            <label>Mật khẩu:</label>
+            <input type="password" [(ngModel)]="user.password" name="password" required>
+        </div>
+
+        <div class="form-group">
+            <label>Tên đầy đủ:</label>
+            <input type="text" [(ngModel)]="user.fullName" name="fullName" required>
+        </div>
+
+        <div class="form-group">
+            <label>Số điện thoại:</label>
+            <input type="text" [(ngModel)]="user.phone" name="phone">
+        </div>
+
+        <div class="form-group">
+            <label>Vai trò:</label>
+            <select [(ngModel)]="user.role" name="role" required>
+                <option value="customer">Customer</option>
+                <option value="agent">Agent</option>
+                <option value="owner">Owner</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="actions">
+            <button type="submit" [disabled]="!form.valid">Lưu</button>
+            <button type="button" (click)="cancel()">Hủy</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,127 @@
+.booking-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.booking-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.booking-card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.property-summary {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.property-summary img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.property-summary h3 {
+    margin: 0 0 5px 0;
+    font-size: 1rem;
+}
+
+.property-summary p {
+    margin: 0;
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    text-align: center;
+    padding: 30px;
+}
+
+.success-message h3 {
+    color: #28a745;
+}
+
+.success-message button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-submit {
+    flex: 1;
+    padding: 12px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-submit:disabled {
+    background: #ccc;
+}
+
+.btn-cancel {
+    padding: 12px 20px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}

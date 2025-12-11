@@ -1,0 +1,65 @@
+<div class="home-container">
+    <div class="header-actions">
+        <h1>Danh sách Bất Động Sản</h1>
+        <button (click)="goToCreate()" class="btn-create">➕ Đăng Tin Mới</button>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="filter-bar">
+        <input type="text" [(ngModel)]="filters.search" placeholder="🔍 Tìm theo tên, địa chỉ, người đăng..."
+            class="filter-input search-input">
+
+        <select [(ngModel)]="filters.listingTypeId" class="filter-input">
+            <option [ngValue]="null">Tất cả loại</option>
+            <option *ngFor="let lt of listingTypes" [ngValue]="lt.id">{{ lt.name }}</option>
+        </select>
+
+        <input type="number" [(ngModel)]="filters.minPrice" placeholder="Giá từ (VND)" class="filter-input price-input">
+        <input type="number" [(ngModel)]="filters.maxPrice" placeholder="Giá đến (VND)"
+            class="filter-input price-input">
+
+        <button (click)="loadProperties()" class="btn-filter">🔍 Tìm kiếm</button>
+        <button (click)="resetFilters()" class="btn-reset">↺ Xóa lọc</button>
+    </div>
+
+    <div class="property-grid">
+        <div *ngFor="let prop of properties" class="property-card">
+            <div class="card-image-container" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
+                <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/house-placeholder.jpg'"
+                    alt="Property Image" class="property-img">
+                <button class="heart-btn" (click)="toggleLike(prop, $event)" [class.liked]="prop.liked">
+                    ❤️
+                </button>
+            </div>
+            <div class="property-info" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
+                <span class="type-badge" [ngClass]="prop.listingType?.code === 'rent' ? 'rent' : 'sale'">
+                    {{ prop.listingType?.name || 'Bất động sản' }}
+                </span>
+                <h3>{{ prop.title }}</h3>
+                <p class="price">{{ prop.price | number }} VND</p>
+                <p class="address">📍 {{ prop.address }}</p>
+                <p class="area" *ngIf="prop.area">📐 {{ prop.area }} m²</p>
+                <p class="location" *ngIf="prop.district">
+                    🏙️ {{ prop.district.name }}<span *ngIf="prop.district.city">, {{ prop.district.city.name }}</span>
+                </p>
+            </div>
+            <div class="poster-info" *ngIf="prop.owner">
+                <img [src]="prop.owner.avatar ? 'http://localhost:3000' + prop.owner.avatar : 'assets/default-avatar.png'"
+                    alt="Poster Avatar" class="poster-avatar">
+                <div class="poster-details">
+                    <span class="poster-name">{{ prop.owner.fullName }}</span>
+                    <span class="poster-phone" *ngIf="prop.owner.phone">📞 {{ prop.owner.phone }}</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button [routerLink]="['/booking', prop.id]" class="btn-booking" (click)="$event.stopPropagation()">
+                    📅 Đặt lịch / Liên hệ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="properties.length === 0" class="no-properties">
+        <p>Chưa có tin đăng nào.</p>
+    </div>
+</div>

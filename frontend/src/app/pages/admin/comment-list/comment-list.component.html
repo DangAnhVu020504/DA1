@@ -1,0 +1,31 @@
+<div class="admin-list-container">
+    <h2>💬 Quản lý Bình luận</h2>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tin đăng</th>
+                <th>Người bình luận</th>
+                <th>Nội dung</th>
+                <th>Ngày tạo</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let comment of comments">
+                <td>{{ comment.id }}</td>
+                <td>{{ comment.listing?.property?.title || 'N/A' }}</td>
+                <td>{{ comment.user?.fullName || 'N/A' }}</td>
+                <td class="content-cell">{{ comment.content }}</td>
+                <td>{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                    <button class="btn-delete" (click)="deleteComment(comment.id!)">🗑️ Xóa</button>
+                </td>
+            </tr>
+            <tr *ngIf="comments.length === 0">
+                <td colspan="6" class="no-data">Chưa có bình luận nào</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,118 @@
+<div class="profile-container">
+  <div *ngIf="loading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Đang tải hồ sơ...</p>
+  </div>
+
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="user && !loading" class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar-container" (click)="triggerFileInput(fileInput)">
+        <img [src]="getAvatarUrl()" alt="Avatar" class="profile-avatar-img">
+        <div class="avatar-overlay">
+          <span>📷 Đổi hình nền</span>
+        </div>
+        <input #fileInput type="file" (change)="onFileSelected($event)" style="display: none" accept="image/*">
+      </div>
+
+      <div class="profile-info-right">
+        <h1 class="profile-name">{{ user.fullName }}</h1>
+        <span [ngClass]="'badge ' + getRoleBadgeClass(user.role)">
+          {{ getRoleLabel(user.role) }}
+        </span>
+      </div>
+    </div>
+
+    <div class="profile-content">
+      <div class="profile-section">
+        <div class="section-header">
+          <h3>Thông Tin Cá Nhân</h3>
+          <button *ngIf="!isEditing" class="btn btn-edit" (click)="toggleEdit()">
+            ✏️ Chỉnh sửa
+          </button>
+        </div>
+
+        <!-- View Mode -->
+        <div *ngIf="!isEditing" class="info-grid">
+          <div class="info-item">
+            <label>📧 Email</label>
+            <p>{{ user.email }}</p>
+          </div>
+
+          <div class="info-item">
+            <label>🆔 ID</label>
+            <p>#{{ user.userId || user.id }}</p>
+          </div>
+
+          <div *ngIf="user.phone" class="info-item">
+            <label>📱 Số Điện Thoại</label>
+            <p>{{ user.phone }}</p>
+          </div>
+
+          <div class="info-item">
+            <label>👥 Vai Trò</label>
+            <p>{{ getRoleLabel(user.role) }}</p>
+          </div>
+
+          <div *ngIf="user.createdAt" class="info-item">
+            <label>📅 Ngày Tạo Tài Khoản</label>
+            <p>{{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+
+          <div *ngIf="user.updatedAt" class="info-item">
+            <label>🔄 Cập Nhật Lần Cuối</label>
+            <p>{{ user.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div *ngIf="isEditing" class="edit-form">
+          <div class="form-group">
+            <label>📝 Họ và Tên</label>
+            <input type="text" class="edit-input" [(ngModel)]="editForm.fullName" placeholder="Nhập họ và tên">
+          </div>
+
+          <div class="form-group">
+            <label>📧 Email</label>
+            <input type="email" class="edit-input" [(ngModel)]="editForm.email" placeholder="Nhập email">
+          </div>
+
+          <div class="form-group">
+            <label>📱 Số Điện Thoại</label>
+            <input type="tel" class="edit-input" [(ngModel)]="editForm.phone" placeholder="Nhập số điện thoại">
+          </div>
+
+          <div class="form-group">
+            <label>👥 Vai Trò</label>
+            <div class="role-selector">
+              <button type="button" class="role-trigger" (click)="toggleRoleDropdown()">
+                {{ getSelectedRoleLabel() }}
+                <span class="dropdown-arrow">▼</span>
+              </button>
+              <div *ngIf="showRoleDropdown" class="role-dropdown">
+                <div *ngFor="let role of availableRoles" class="role-option"
+                  [class.selected]="editForm.role === role.value" (click)="selectRole(role.value)">
+                  {{ role.label }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="edit-actions">
+            <button class="btn btn-success" (click)="saveProfile()">💾 Lưu</button>
+            <button class="btn btn-secondary" (click)="cancelEdit()">❌ Hủy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn btn-danger" (click)="logout()">
+          🚪 Đăng Xuất
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
