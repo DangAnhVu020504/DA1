@@ -83,6 +83,9 @@ export class Property {
     })
     status: PropertyStatus;
 
+    @Column({ default: 0 })
+    views: number;
+
     @ManyToMany(() => Amenity)
     @JoinTable({
         name: 'property_amenities',

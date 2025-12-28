@@ -89,6 +89,12 @@ export class PropertiesService {
             await this.propertyVideosRepository.save(video);
         }
 
+        // Save amenities if provided
+        if (createPropertyDto.amenityIds && createPropertyDto.amenityIds.length > 0) {
+            saved.amenities = createPropertyDto.amenityIds.map((id: number) => ({ id }));
+            await this.propertiesRepository.save(saved);
+        }
+
         // Auto-create listing for this property (required for comments functionality)
         const listing = this.listingsRepository.create({
             property: { id: saved.id } as any,
@@ -113,6 +119,10 @@ export class PropertiesService {
         maxArea?: string;
         bedrooms?: string;
         bathrooms?: string;
+        page?: string;
+        limit?: string;
+        sortBy?: string;
+        sortOrder?: string;
     }) {
         const query = this.propertiesRepository.createQueryBuilder('property')
             .leftJoinAndSelect('property.owner', 'owner')
@@ -120,8 +130,7 @@ export class PropertiesService {
             .leftJoinAndSelect('property.listingType', 'listingType')
             .leftJoinAndSelect('property.district', 'district')
             .leftJoinAndSelect('district.city', 'city')
-            .where('property.status = :status', { status: 'available' })
-            .orderBy('property.createdAt', 'DESC');
+            .where('property.status = :status', { status: 'available' });
 
         if (filters?.search) {
             query.andWhere(
@@ -167,10 +176,41 @@ export class PropertiesService {
             query.andWhere('property.bathrooms >= :bathrooms', { bathrooms: parseInt(filters.bathrooms) });
         }
 
+        // Sorting
+        const sortBy = filters?.sortBy || 'createdAt';
+        const sortOrder = (filters?.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC') as 'ASC' | 'DESC';
+
+        const validSortFields = ['createdAt', 'price', 'area', 'views'];
+        if (validSortFields.includes(sortBy)) {
+            query.orderBy(`property.${sortBy}`, sortOrder);
+        } else {
+            query.orderBy('property.createdAt', 'DESC');
+        }
+
+        // Count total before pagination
+        const total = await query.getCount();
+
+        // Pagination
+        const page = parseInt(filters?.page || '1');
+        const limit = parseInt(filters?.limit || '12');
+        const skip = (page - 1) * limit;
+
+        query.skip(skip).take(limit);
+
         const properties = await query.getMany();
 
         // Transform all properties to add virtual fields
-        return Promise.all(properties.map(p => this.transformProperty(p)));
+        const data = await Promise.all(properties.map(p => this.transformProperty(p)));
+
+        return {
+            data,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+            }
+        };
     }
 
     async findByOwner(userId: number) {
@@ -190,6 +230,11 @@ export class PropertiesService {
         if (!property) {
             throw new NotFoundException(`Property with ID ${id} not found`);
         }
+
+        // Increment view count
+        await this.propertiesRepository.increment({ id }, 'views', 1);
+        property.views = (property.views || 0) + 1;
+
         return this.transformProperty(property);
     }
 
@@ -226,6 +271,19 @@ export class PropertiesService {
                 await this.propertyImagesRepository.save(image);
             }
             delete updateData.imageUrl;
+        }
+
+        // Handle amenities update
+        if (updatePropertyDto.amenityIds !== undefined) {
+            const property = await this.propertiesRepository.findOne({
+                where: { id },
+                relations: ['amenities']
+            });
+            if (property) {
+                property.amenities = updatePropertyDto.amenityIds.map((aid: number) => ({ id: aid }));
+                await this.propertiesRepository.save(property);
+            }
+            delete updateData.amenityIds;
         }
 
         await this.propertiesRepository.update(id, updateData);

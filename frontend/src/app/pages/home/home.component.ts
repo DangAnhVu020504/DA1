@@ -20,6 +20,16 @@ export class HomeComponent implements OnInit {
     cities: City[] = [];
     districts: District[] = [];
 
+    // Pagination
+    currentPage = 1;
+    totalPages = 1;
+    totalItems = 0;
+    itemsPerPage = 12;
+
+    // Sorting
+    sortBy = 'createdAt';
+    sortOrder = 'DESC';
+
     filters = {
         search: '',
         listingTypeId: null as number | null,
@@ -65,7 +75,12 @@ export class HomeComponent implements OnInit {
     }
 
     loadProperties() {
-        const params: any = {};
+        const params: any = {
+            page: this.currentPage,
+            limit: this.itemsPerPage,
+            sortBy: this.sortBy,
+            sortOrder: this.sortOrder
+        };
         if (this.filters.search) params.search = this.filters.search;
         if (this.filters.listingTypeId) params.listingTypeId = this.filters.listingTypeId;
         if (this.filters.minPrice) params.minPrice = this.filters.minPrice;
@@ -78,8 +93,11 @@ export class HomeComponent implements OnInit {
         if (this.filters.bathrooms) params.bathrooms = this.filters.bathrooms;
 
         this.propertyService.findAll(params).subscribe({
-            next: (data) => {
-                this.properties = data;
+            next: (response) => {
+                this.properties = response.data;
+                this.currentPage = response.pagination.page;
+                this.totalPages = response.pagination.totalPages;
+                this.totalItems = response.pagination.total;
                 // Kiểm tra trạng thái yêu thích cho từng property
                 this.loadFavoriteStatus();
             },
@@ -102,6 +120,42 @@ export class HomeComponent implements OnInit {
                 }
             });
         });
+    }
+
+    onSortChange() {
+        this.currentPage = 1;
+        this.loadProperties();
+    }
+
+    goToPage(page: number) {
+        if (page >= 1 && page <= this.totalPages) {
+            this.currentPage = page;
+            this.loadProperties();
+        }
+    }
+
+    nextPage() {
+        if (this.currentPage < this.totalPages) {
+            this.currentPage++;
+            this.loadProperties();
+        }
+    }
+
+    prevPage() {
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.loadProperties();
+        }
+    }
+
+    getPageNumbers(): number[] {
+        const pages: number[] = [];
+        const start = Math.max(1, this.currentPage - 2);
+        const end = Math.min(this.totalPages, this.currentPage + 2);
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
     }
 
     goToCreate() {
@@ -134,6 +188,9 @@ export class HomeComponent implements OnInit {
             bathrooms: null
         };
         this.districts = [];
+        this.currentPage = 1;
+        this.sortBy = 'createdAt';
+        this.sortOrder = 'DESC';
         this.loadProperties();
     }
 }

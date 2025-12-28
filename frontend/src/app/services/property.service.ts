@@ -14,6 +14,7 @@ export interface Property {
     direction?: string;
     legalStatus?: string;
     status?: string;
+    views?: number;
     createdAt?: Date;
     imageUrl?: string; // Thumbnail image URL
     videoUrl?: string; // Video URL
@@ -26,6 +27,16 @@ export interface Property {
     amenities?: { id: number; name: string }[];
     liked?: boolean;
     type?: string; // Derived from listingType.code ('sale' or 'rent')
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
 }
 
 @Injectable({
@@ -52,7 +63,11 @@ export class PropertyService {
         maxArea?: number;
         bedrooms?: number;
         bathrooms?: number;
-    }): Observable<Property[]> {
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        sortOrder?: string;
+    }): Observable<PaginatedResponse<Property>> {
         let params = new HttpParams();
         if (filters?.search) params = params.set('search', filters.search);
         if (filters?.listingTypeId) params = params.set('listingTypeId', filters.listingTypeId.toString());
@@ -64,7 +79,11 @@ export class PropertyService {
         if (filters?.maxArea) params = params.set('maxArea', filters.maxArea.toString());
         if (filters?.bedrooms) params = params.set('bedrooms', filters.bedrooms.toString());
         if (filters?.bathrooms) params = params.set('bathrooms', filters.bathrooms.toString());
-        return this.http.get<Property[]>(this.apiUrl, { params });
+        if (filters?.page) params = params.set('page', filters.page.toString());
+        if (filters?.limit) params = params.set('limit', filters.limit.toString());
+        if (filters?.sortBy) params = params.set('sortBy', filters.sortBy);
+        if (filters?.sortOrder) params = params.set('sortOrder', filters.sortOrder);
+        return this.http.get<PaginatedResponse<Property>>(this.apiUrl, { params });
     }
 
     create(property: any): Observable<Property> {

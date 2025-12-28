@@ -13,6 +13,7 @@
 
         <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()" class="status-select">
             <option value="all">📋 Tất cả trạng thái</option>
+            <option value="draft">📝 Bản nháp</option>
             <option value="available">✅ Đang hiển thị</option>
             <option value="sold">🏷️ Đã bán</option>
             <option value="rented">🔑 Đã cho thuê</option>
@@ -115,6 +116,19 @@
                 </div>
             </div>
 
+            <!-- Amenities Selection -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>🏠 Tiện ích</label>
+                    <div class="amenities-grid">
+                        <button type="button" *ngFor="let amenity of amenities" class="amenity-btn"
+                            [class.selected]="isAmenitySelected(amenity.id)" (click)="toggleAmenity(amenity.id)">
+                            {{ amenity.name }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Hình ảnh mô tả</label>
@@ -183,20 +197,19 @@
             </div>
             <div class="property-status-actions">
                 <button class="btn-action btn-publish" (click)="publishProperty(prop.id!)"
-                    *ngIf="prop.status !== 'available' && prop.status !== 'sold' && prop.status !== 'rented'"
-                    title="Đăng tin">
+                    *ngIf="prop.status !== 'available'" title="Đăng tin lên trang chủ">
                     📢 Đăng tin
                 </button>
                 <button class="btn-action btn-unpublish" (click)="unpublishProperty(prop.id!)"
                     *ngIf="prop.status === 'available'" title="Gỡ tin đăng">
                     🚫 Gỡ tin
                 </button>
-                <button class="btn-action btn-sold" (click)="markAsSold(prop.id!)" *ngIf="prop.status !== 'sold'"
+                <button class="btn-action btn-sold" (click)="markAsSold(prop.id!)" *ngIf="prop.status === 'available'"
                     title="Đánh dấu đã bán">
                     🏷️ Đã bán
                 </button>
-                <button class="btn-action btn-rented" (click)="markAsRented(prop.id!)" *ngIf="prop.status !== 'rented'"
-                    title="Đánh dấu đã cho thuê">
+                <button class="btn-action btn-rented" (click)="markAsRented(prop.id!)"
+                    *ngIf="prop.status === 'available'" title="Đánh dấu đã cho thuê">
                     🔑 Đã cho thuê
                 </button>
             </div>

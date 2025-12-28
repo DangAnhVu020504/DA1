@@ -51,6 +51,25 @@
         </div>
     </div>
 
+    <!-- Sort & Results Info -->
+    <div class="sort-bar">
+        <span class="result-count">📊 Tìm thấy {{ totalItems }} kết quả</span>
+
+        <div class="sort-controls">
+            <label>Sắp xếp:</label>
+            <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()" class="sort-select">
+                <option value="createdAt">Mới nhất</option>
+                <option value="price">Giá</option>
+                <option value="area">Diện tích</option>
+                <option value="views">Lượt xem</option>
+            </select>
+            <select [(ngModel)]="sortOrder" (ngModelChange)="onSortChange()" class="sort-select">
+                <option value="DESC">Giảm dần</option>
+                <option value="ASC">Tăng dần</option>
+            </select>
+        </div>
+    </div>
+
     <div class="property-grid">
         <div *ngFor="let prop of properties" class="property-card">
             <div class="card-image-container" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
@@ -59,6 +78,7 @@
                 <button class="heart-btn" (click)="toggleLike(prop, $event)" [class.liked]="prop.liked">
                     ❤️
                 </button>
+                <span class="views-badge" *ngIf="prop.views">👁️ {{ prop.views }}</span>
             </div>
             <div class="property-info" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
                 <span class="type-badge" [ngClass]="prop.listingType?.code === 'rent' ? 'rent' : 'sale'">
@@ -90,5 +110,21 @@
 
     <div *ngIf="properties.length === 0" class="no-properties">
         <p>Chưa có tin đăng nào.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+        <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+        <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+
+        <button *ngFor="let page of getPageNumbers()" class="page-btn" [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page }}
+        </button>
+
+        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+        <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
+
+        <span class="page-info">Trang {{ currentPage }} / {{ totalPages }}</span>
     </div>
 </div>

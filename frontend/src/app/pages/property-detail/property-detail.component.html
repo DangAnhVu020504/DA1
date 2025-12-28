@@ -48,6 +48,21 @@
                     <p class="description">{{ property.description }}</p>
                 </div>
 
+                <!-- Property Stats -->
+                <div class="stats-section" *ngIf="property.views">
+                    <span class="stat-badge">👁️ {{ property.views }} lượt xem</span>
+                </div>
+
+                <!-- Amenities Section -->
+                <div class="amenities-section" *ngIf="property.amenities && property.amenities.length > 0">
+                    <h3>🏠 Tiện ích</h3>
+                    <div class="amenities-list">
+                        <span class="amenity-tag" *ngFor="let amenity of property.amenities">
+                            ✓ {{ amenity.name }}
+                        </span>
+                    </div>
+                </div>
+
                 <!-- Comments Section -->
                 <div class="comments-section">
                     <h3>💬 Bình luận</h3>

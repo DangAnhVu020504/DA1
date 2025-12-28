@@ -21,7 +21,7 @@ export class AdminPropertyListComponent implements OnInit {
 
     loadProperties() {
         this.propertyService.findAll().subscribe({
-            next: (data) => this.properties = data,
+            next: (response) => this.properties = response.data,
             error: (err) => console.error(err)
         });
     }

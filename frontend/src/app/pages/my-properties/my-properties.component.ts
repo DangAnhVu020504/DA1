@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PropertyService, Property } from '../../services/property.service';
-import { LookupService, City, District, PropertyType, ListingType } from '../../services/lookup.service';
+import { LookupService, City, District, PropertyType, ListingType, Amenity } from '../../services/lookup.service';
 
 @Component({
     selector: 'app-my-properties',
@@ -47,6 +47,8 @@ export class MyPropertiesComponent implements OnInit {
     districts: District[] = [];
     propertyTypes: PropertyType[] = [];
     listingTypes: ListingType[] = [];
+    amenities: Amenity[] = [];
+    selectedAmenityIds: number[] = [];
     selectedCityId: number | null = null;
     selectedFile: File | null = null;
 
@@ -65,6 +67,7 @@ export class MyPropertiesComponent implements OnInit {
         this.lookupService.getCities().subscribe(data => this.cities = data);
         this.lookupService.getPropertyTypes().subscribe(data => this.propertyTypes = data);
         this.lookupService.getListingTypes().subscribe(data => this.listingTypes = data);
+        this.lookupService.getAmenities().subscribe(data => this.amenities = data);
     }
 
     onCityChange() {
@@ -153,6 +156,9 @@ export class MyPropertiesComponent implements OnInit {
             this.selectedCityId = prop.district.city.id;
             this.onCityChange();
         }
+
+        // Load selected amenities
+        this.selectedAmenityIds = prop.amenities?.map(a => a.id) || [];
     }
 
     closeForm() {
@@ -175,7 +181,21 @@ export class MyPropertiesComponent implements OnInit {
         };
         this.selectedCityId = null;
         this.selectedFile = null;
+        this.selectedAmenityIds = [];
         this.formError = '';
+    }
+
+    toggleAmenity(amenityId: number) {
+        const idx = this.selectedAmenityIds.indexOf(amenityId);
+        if (idx > -1) {
+            this.selectedAmenityIds.splice(idx, 1);
+        } else {
+            this.selectedAmenityIds.push(amenityId);
+        }
+    }
+
+    isAmenitySelected(amenityId: number): boolean {
+        return this.selectedAmenityIds.includes(amenityId);
     }
 
     onFileSelected(event: any) {
@@ -192,6 +212,9 @@ export class MyPropertiesComponent implements OnInit {
                 const uploadRes = await this.propertyService.uploadImage(this.selectedFile).toPromise();
                 this.property.imageUrl = uploadRes.url;
             }
+
+            // Add amenities to property data
+            this.property.amenityIds = this.selectedAmenityIds;
 
             if (this.isEditing && this.editingId) {
                 // Update existing property

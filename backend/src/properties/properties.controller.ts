@@ -32,10 +32,15 @@ export class PropertiesController {
         @Query('maxArea') maxArea?: string,
         @Query('bedrooms') bedrooms?: string,
         @Query('bathrooms') bathrooms?: string,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('sortOrder') sortOrder?: string,
     ) {
         return this.propertiesService.findAll({
             search, listingTypeId, minPrice, maxPrice,
-            cityId, districtId, minArea, maxArea, bedrooms, bathrooms
+            cityId, districtId, minArea, maxArea, bedrooms, bathrooms,
+            page, limit, sortBy, sortOrder
         });
     }
 
