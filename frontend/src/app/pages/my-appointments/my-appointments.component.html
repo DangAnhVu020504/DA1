@@ -1,0 +1,119 @@
+<div class="appointments-page">
+    <div class="appointments-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📅 Lịch hẹn của tôi</h1>
+            <p class="subtitle">Quản lý các lịch hẹn xem BĐS</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <button class="tab-btn" [class.active]="activeTab === 'received'" (click)="setTab('received')">
+                <span class="tab-icon">📥</span>
+                <span class="tab-text">Lịch hẹn nhận được</span>
+                <span class="tab-count" *ngIf="receivedAppointments.length">{{ receivedAppointments.length }}</span>
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'sent'" (click)="setTab('sent')">
+                <span class="tab-icon">📤</span>
+                <span class="tab-text">Lịch hẹn đã gửi</span>
+                <span class="tab-count" *ngIf="sentAppointments.length">{{ sentAppointments.length }}</span>
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Đang tải...</p>
+        </div>
+
+        <!-- Received Appointments Tab -->
+        <div *ngIf="!loading && activeTab === 'received'" class="appointments-list">
+            <div *ngIf="receivedAppointments.length === 0" class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h2>Chưa có lịch hẹn nào</h2>
+                <p>Bạn sẽ nhận được thông báo khi có người đặt lịch xem BĐS của bạn</p>
+            </div>
+
+            <div *ngFor="let apt of receivedAppointments" class="appointment-card">
+                <div class="card-header">
+                    <span class="status-badge" [ngClass]="getStatusClass(apt.status || 'pending')">
+                        {{ getStatusText(apt.status || 'pending') }}
+                    </span>
+                    <span class="date">{{ apt.scheduledAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="property-info">
+                        <span class="property-icon">🏠</span>
+                        <a [routerLink]="['/properties', apt.listing?.property?.id]" class="property-title">
+                            {{ apt.listing?.property?.title || apt.listing?.title || 'N/A' }}
+                        </a>
+                    </div>
+                    <div class="contact-info">
+                        <div class="info-row">
+                            <span class="label">👤 Người đặt:</span>
+                            <span class="value">{{ apt.fullName }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">📱 Điện thoại:</span>
+                            <span class="value">{{ apt.phone }}</span>
+                        </div>
+                        <div class="info-row" *ngIf="apt.message">
+                            <span class="label">💬 Tin nhắn:</span>
+                            <span class="value">{{ apt.message }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions" *ngIf="apt.status === 'pending'">
+                    <button class="btn-confirm" (click)="confirmAppointment(apt.id!)">
+                        ✅ Xác nhận
+                    </button>
+                    <button class="btn-reject" (click)="deleteAppointment(apt.id!)">
+                        ❌ Từ chối
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sent Appointments Tab -->
+        <div *ngIf="!loading && activeTab === 'sent'" class="appointments-list">
+            <div *ngIf="sentAppointments.length === 0" class="empty-state">
+                <div class="empty-icon">📤</div>
+                <h2>Chưa gửi lịch hẹn nào</h2>
+                <p>Bạn có thể đặt lịch hẹn xem BĐS từ trang chi tiết</p>
+                <a routerLink="/home" class="btn-home">🏠 Tìm BĐS ngay</a>
+            </div>
+
+            <div *ngFor="let apt of sentAppointments" class="appointment-card sent">
+                <div class="card-header">
+                    <span class="status-badge" [ngClass]="getStatusClass(apt.status || 'pending')">
+                        {{ getStatusText(apt.status || 'pending') }}
+                    </span>
+                    <span class="date">{{ apt.scheduledAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="property-info">
+                        <span class="property-icon">🏠</span>
+                        <a [routerLink]="['/properties', apt.listing?.property?.id]" class="property-title">
+                            {{ apt.listing?.property?.title || apt.listing?.title || 'N/A' }}
+                        </a>
+                    </div>
+                    <div class="contact-info">
+                        <div class="info-row" *ngIf="apt.listing?.property?.owner">
+                            <span class="label">👤 Chủ nhà:</span>
+                            <span class="value">{{ apt.listing?.property?.owner?.fullName }}</span>
+                        </div>
+                        <div class="info-row" *ngIf="apt.message">
+                            <span class="label">💬 Tin nhắn:</span>
+                            <span class="value">{{ apt.message }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions" *ngIf="apt.status === 'pending'">
+                    <button class="btn-cancel" (click)="deleteAppointment(apt.id!)">
+                        🗑️ Hủy lịch hẹn
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { PropertiesService } from './properties.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerConfig } from '../config/multer.config';
+import { multerConfig, multerVideoConfig } from '../config/multer.config';
 
 @Controller('properties')
 export class PropertiesController {
@@ -26,8 +26,17 @@ export class PropertiesController {
         @Query('listingTypeId') listingTypeId?: string,
         @Query('minPrice') minPrice?: string,
         @Query('maxPrice') maxPrice?: string,
+        @Query('cityId') cityId?: string,
+        @Query('districtId') districtId?: string,
+        @Query('minArea') minArea?: string,
+        @Query('maxArea') maxArea?: string,
+        @Query('bedrooms') bedrooms?: string,
+        @Query('bathrooms') bathrooms?: string,
     ) {
-        return this.propertiesService.findAll({ search, listingTypeId, minPrice, maxPrice });
+        return this.propertiesService.findAll({
+            search, listingTypeId, minPrice, maxPrice,
+            cityId, districtId, minArea, maxArea, bedrooms, bathrooms
+        });
     }
 
     @Get(':id')
@@ -43,6 +52,16 @@ export class PropertiesController {
             throw new BadRequestException('File is not an image');
         }
         return { url: `/uploads/${file.filename}` };
+    }
+
+    @Post('upload-video')
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor('file', multerVideoConfig))
+    uploadVideo(@UploadedFile() file: any) {
+        if (!file) {
+            throw new BadRequestException('File is not a video');
+        }
+        return { url: `/uploads/videos/${file.filename}` };
     }
 
     @Patch(':id')

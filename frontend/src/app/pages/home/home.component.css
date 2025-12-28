@@ -2,8 +2,16 @@
    Home Page - Modern Property Grid
    ============================================ */
 
+/* Home Page Background */
+:host {
+    display: block;
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.8) 50%, rgba(15, 52, 96, 0.8) 100%),
+        url('/assets/city-background.jpg') center/cover no-repeat fixed;
+}
+
 .home-container {
-    padding: 0;
+    padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -22,16 +30,18 @@
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
-.header-actions h2 {
-    color: #1f2937;
-    font-size: 1.5rem;
-    font-weight: 700;
+.featured-title {
+    color: #1f2937 !important;
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-shadow: none !important;
+    margin: 0;
 }
 
 /* Filter Bar - Glass Effect */
 .filter-bar {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 12px;
     margin-bottom: 2rem;
     padding: 1.5rem;
@@ -39,9 +49,23 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 16px;
-    align-items: center;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .filter-input {
@@ -67,6 +91,14 @@
 
 .price-input {
     width: 150px;
+}
+
+.area-input {
+    width: 120px;
+}
+
+.room-input {
+    width: 110px;
 }
 
 .btn-filter {

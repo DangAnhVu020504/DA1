@@ -1,34 +1,37 @@
 <nav>
-  <a routerLink="/home" class="nav-brand">🏢 BatDongSanVIP</a>
-  <div class="nav-links">
-    <!-- Admin Link -->
-    <a *ngIf="isAdmin$ | async" routerLink="/admin/dashboard" routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }">
-      📊 Dashboard
-    </a>
-    <a *ngIf="isAdmin$ | async" routerLink="/admin/users" routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }">
-      👥 Người dùng
-    </a>
-    <a *ngIf="isAdmin$ | async" routerLink="/admin/properties" routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }">
-      📋 Tin đăng
-    </a>
-    <a *ngIf="isAdmin$ | async" routerLink="/admin/comments" routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }">
-      💬 Bình luận
-    </a>
-    <a *ngIf="isAdmin$ | async" routerLink="/admin/appointments" routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }">
-      📅 Lịch hẹn
-    </a>
+  <!-- Left: Brand Logo -->
+  <a routerLink="/home" class="nav-brand">
+    <img src="assets/logo.jpg" alt="BatDongSanVIP" class="nav-logo">
+    <span class="brand-text">BatDongSan<span class="brand-vip">VIP</span></span>
+  </a>
 
+  <!-- Center: Empty -->
+  <div class="nav-center"></div>
+
+  <!-- Right: User Section -->
+
+  <div class="nav-right">
     <!-- User Logged In -->
-    <div *ngIf="currentUser$ | async as user; else guestNav" class="user-group">
-      <!-- Property Management Link -->
-      <a routerLink="/my-properties" class="property-menu-btn" title="Quản lý BĐS">
-        🏠 Quản lý BDS
-      </a>
+    <div *ngIf="currentUser$ | async as user; else guestNav" class="user-section">
+      <!-- Quick Action Buttons -->
+      <div class="quick-actions">
+        <a routerLink="/news" class="action-btn action-btn-orange" title="Tin tức BĐS">
+          <span class="action-icon">📰</span>
+          <span class="action-text">Tin tức</span>
+        </a>
+        <a routerLink="/my-properties" class="action-btn action-btn-green" title="Quản lý BĐS">
+          <span class="action-icon">🏠</span>
+          <span class="action-text">Quản lý BDS</span>
+        </a>
+        <a routerLink="/favorites" class="action-btn action-btn-red" title="Tin yêu thích">
+          <span class="action-icon">❤️</span>
+          <span class="action-text">Yêu thích</span>
+        </a>
+        <a routerLink="/my-appointments" class="action-btn action-btn-purple" title="Lịch hẹn">
+          <span class="action-icon">📅</span>
+          <span class="action-text">Lịch hẹn</span>
+        </a>
+      </div>
 
       <!-- Notification Bell -->
       <div class="notification-wrapper">
@@ -68,29 +71,73 @@
         </div>
       </div>
 
-      <span class="welcome-text">Xin chào, {{ user.fullName }}</span>
-      <a routerLink="/profile" class="avatar-link" title="Hồ sơ">
-        <img [src]="user.avatar ? 'http://localhost:3000' + user.avatar : 'assets/default-avatar.png'"
-          class="nav-avatar" alt="Avatar">
-      </a>
-      <button (click)="logout()" class="btn-logout">🚪 Đăng xuất</button>
+      <!-- User Profile Section -->
+      <div class="user-profile">
+        <div class="user-info">
+          <span class="user-name">{{ user.fullName }}</span>
+          <span class="user-role">{{ (isAdmin$ | async) ? 'Admin' : 'Thành viên' }}</span>
+        </div>
+        <a routerLink="/profile" class="avatar-link" title="Hồ sơ">
+          <img [src]="user.avatar ? 'http://localhost:3000' + user.avatar : 'assets/default-avatar.png'"
+            class="nav-avatar" alt="Avatar">
+        </a>
+        <button (click)="logout()" class="btn-logout" title="Đăng xuất">
+          <span class="logout-icon">🚪</span>
+        </button>
+      </div>
     </div>
 
     <!-- Guest -->
     <ng-template #guestNav>
-      <a routerLink="/login" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        📝 Đăng Nhập
-      </a>
-      <a routerLink="/register" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        ✍️ Đăng Ký
-      </a>
+      <div class="guest-actions">
+        <a routerLink="/login" class="btn-auth btn-login">
+          <span>📝</span> Đăng Nhập
+        </a>
+        <a routerLink="/register" class="btn-auth btn-register">
+          <span>✍️</span> Đăng Ký
+        </a>
+      </div>
     </ng-template>
   </div>
 </nav>
 
-<main>
-  <router-outlet></router-outlet>
-</main>
+<!-- App Container with Sidebar -->
+<div class="app-container">
+  <!-- Admin Sidebar -->
+  <aside *ngIf="isAdmin$ | async" class="admin-sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-icon">⚙️</span>
+      <span class="sidebar-title">Quản trị</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" class="sidebar-item">
+        <span class="sidebar-item-icon">📊</span>
+        <span class="sidebar-item-text">Dashboard</span>
+      </a>
+      <a routerLink="/admin/users" routerLinkActive="active" class="sidebar-item">
+        <span class="sidebar-item-icon">👥</span>
+        <span class="sidebar-item-text">Người dùng</span>
+      </a>
+      <a routerLink="/admin/properties" routerLinkActive="active" class="sidebar-item">
+        <span class="sidebar-item-icon">📋</span>
+        <span class="sidebar-item-text">Tin đăng</span>
+      </a>
+      <a routerLink="/admin/comments" routerLinkActive="active" class="sidebar-item">
+        <span class="sidebar-item-icon">💬</span>
+        <span class="sidebar-item-text">Bình luận</span>
+      </a>
+      <a routerLink="/admin/appointments" routerLinkActive="active" class="sidebar-item">
+        <span class="sidebar-item-icon">📅</span>
+        <span class="sidebar-item-text">Lịch hẹn</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.with-sidebar]="isAdmin$ | async">
+    <router-outlet></router-outlet>
+  </main>
+</div>
 
 <!-- Footer -->
 <footer class="footer">

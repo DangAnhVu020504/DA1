@@ -18,13 +18,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let prop of properties">
+            <tr *ngFor="let prop of properties" class="clickable-row">
                 <td>{{ prop.id }}</td>
-                <td>
+                <td (click)="viewPropertyDetail(prop.id!)" class="clickable">
                     <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/house-placeholder.jpg'"
                         class="thumb-img" alt="Property">
                 </td>
-                <td>{{ prop.title }}</td>
+                <td (click)="viewPropertyDetail(prop.id!)" class="clickable title-cell">{{ prop.title }}</td>
                 <td>
                     <span [class]="prop.type === 'rent' ? 'badge-rent' : 'badge-sale'">
                         {{ prop.type === 'rent' ? 'Cho thuê' : 'Bán' }}
@@ -33,7 +33,8 @@
                 <td>{{ prop.price | number }} VND</td>
                 <td>{{ prop.address }}</td>
                 <td>{{ prop.user?.fullName }}</td>
-                <td>
+                <td class="action-buttons">
+                    <button (click)="viewPropertyDetail(prop.id!)" class="btn-view">👁️ Xem</button>
                     <button (click)="editProperty(prop.id!)" class="btn-edit">✏️ Sửa</button>
                     <button (click)="deleteProperty(prop.id!)" class="btn-delete">🗑️ Xóa</button>
                 </td>

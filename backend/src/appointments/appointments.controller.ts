@@ -25,6 +25,13 @@ export class AppointmentsController {
         return this.appointmentsService.countPendingByOwner(req.user.id);
     }
 
+    // Get appointments sent by current user
+    @Get('sent')
+    @UseGuards(JwtAuthGuard)
+    findSent(@Request() req) {
+        return this.appointmentsService.findByCustomer(req.user.id);
+    }
+
     @Get()
     findAll() {
         return this.appointmentsService.findAll();

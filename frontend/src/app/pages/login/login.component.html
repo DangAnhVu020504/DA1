@@ -1,53 +1,157 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-header">
-      <div class="auth-icon">🔐</div>
-      <h1>Đăng Nhập</h1>
-      <p>Quản lý bất động sản của bạn</p>
-    </div>
-
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-      <div class="form-group">
-        <label for="email">📧 Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="Nhập email của bạn"
-          class="form-input"
-          [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-        />
-        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
-          ⚠️ Vui lòng nhập email hợp lệ
+<div class="login-page">
+    <div class="login-container">
+        <!-- Left Side - Branding -->
+        <div class="login-branding">
+            <div class="branding-content">
+                <div class="logo-wrapper">
+                    <span class="logo-icon">🏢</span>
+                    <h1>BatDongSan<span class="vip">VIP</span></h1>
+                </div>
+                <p class="tagline">Nền tảng bất động sản hàng đầu Việt Nam</p>
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-icon">🏠</span>
+                        <span>Hàng nghìn BĐS chất lượng</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔒</span>
+                        <span>Giao dịch an toàn, bảo mật</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💎</span>
+                        <span>Dịch vụ VIP đẳng cấp</span>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="password">🔑 Mật Khẩu</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="Nhập mật khẩu"
-          class="form-input"
-          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-        />
-        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
-          ⚠️ Mật khẩu là bắt buộc
+        <!-- Right Side - Login Form -->
+        <div class="login-form-wrapper">
+            <div class="login-form-container" *ngIf="!showForgotPassword">
+                <h2>Đăng Nhập</h2>
+                <p class="login-subtitle">Chào mừng bạn quay trở lại!</p>
+
+                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="label-icon">📧</span>
+                            Email
+                        </label>
+                        <input type="email" id="email" formControlName="email" placeholder="Nhập email của bạn"
+                            autocomplete="email">
+                        <div class="error-message"
+                            *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+                            <span>⚠️</span> Email không hợp lệ
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <span class="label-icon">🔐</span>
+                            Mật khẩu
+                        </label>
+                        <input type="password" id="password" formControlName="password" placeholder="Nhập mật khẩu"
+                            autocomplete="current-password">
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            Ghi nhớ đăng nhập
+                        </label>
+                        <a href="javascript:void(0)" class="forgot-password" (click)="toggleForgotPassword()">Quên mật
+                            khẩu?</a>
+                    </div>
+
+                    <div class="error-message global-error" *ngIf="errorMsg">
+                        <span>❌</span> {{ errorMsg }}
+                    </div>
+
+                    <button type="submit" class="btn-login" [disabled]="loginForm.invalid">
+                        <span class="btn-text">Đăng Nhập</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>hoặc</span>
+                </div>
+
+                <div class="social-login">
+                    <button class="btn-social google">
+                        <span>G</span>
+                        Google
+                    </button>
+                    <button class="btn-social facebook">
+                        <span>f</span>
+                        Facebook
+                    </button>
+                </div>
+
+                <p class="register-link">
+                    Chưa có tài khoản?
+                    <a routerLink="/register">Đăng ký ngay</a>
+                </p>
+            </div>
+
+            <!-- Forgot Password Form -->
+            <div class="login-form-container forgot-password-form" *ngIf="showForgotPassword">
+                <div class="forgot-header">
+                    <button class="btn-back" (click)="toggleForgotPassword()">← Quay lại</button>
+                </div>
+                <h2>🔐 Quên mật khẩu</h2>
+                <p class="login-subtitle">Nhập email và số điện thoại để xác minh</p>
+
+                <div class="form-group">
+                    <label>
+                        <span class="label-icon">📧</span>
+                        Email đăng ký
+                    </label>
+                    <input type="email" [(ngModel)]="forgotData.email" placeholder="Nhập email của bạn">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <span class="label-icon">📱</span>
+                        Số điện thoại đăng ký
+                    </label>
+                    <input type="tel" [(ngModel)]="forgotData.phone" placeholder="Nhập số điện thoại">
+                </div>
+
+                <div class="form-divider"></div>
+
+                <div class="form-group">
+                    <label>
+                        <span class="label-icon">🔑</span>
+                        Mật khẩu mới
+                    </label>
+                    <input type="password" [(ngModel)]="forgotData.newPassword"
+                        placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <span class="label-icon">✅</span>
+                        Xác nhận mật khẩu
+                    </label>
+                    <input type="password" [(ngModel)]="forgotData.confirmPassword" placeholder="Nhập lại mật khẩu mới">
+                </div>
+
+                <div class="reset-message" *ngIf="resetMessage" [class.success]="resetMessage.includes('✅')">
+                    {{ resetMessage }}
+                </div>
+
+                <button type="button" class="btn-login" (click)="resetPassword()" [disabled]="isResetting">
+                    <span class="btn-text">{{ isResetting ? 'Đang xử lý...' : 'Đặt lại mật khẩu' }}</span>
+                    <span class="btn-icon">→</span>
+                </button>
+
+                <p class="register-link">
+                    Nhớ mật khẩu rồi?
+                    <a href="javascript:void(0)" (click)="toggleForgotPassword()">Đăng nhập</a>
+                </p>
+            </div>
         </div>
-      </div>
-
-      <div *ngIf="errorMsg" class="alert alert-danger">
-        ❌ {{ errorMsg }}
-      </div>
-
-      <button type="submit" [disabled]="loginForm.invalid" class="btn btn-primary btn-large">
-        Đăng Nhập
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      <p>Chưa có tài khoản? <a routerLink="/register" class="link-highlight">Đăng ký ngay</a></p>
     </div>
-  </div>
 </div>

@@ -57,4 +57,8 @@ export class UsersService {
   async updateAvatar(id: number, avatarUrl: string) {
     await this.usersRepository.update(id, { avatar: avatarUrl });
   }
+
+  async updatePassword(id: number, newPasswordHash: string) {
+    await this.usersRepository.update(id, { passwordHash: newPasswordHash });
+  }
 }

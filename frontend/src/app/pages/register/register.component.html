@@ -1,80 +1,103 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-header">
-      <div class="auth-icon">✍️</div>
-      <h1>Đăng Ký</h1>
-      <p>Tạo tài khoản quản lý BDS</p>
+<div class="register-page">
+    <div class="register-container">
+        <!-- Left Side - Branding -->
+        <div class="register-branding">
+            <div class="branding-content">
+                <div class="logo-wrapper">
+                    <span class="logo-icon">🏢</span>
+                    <h1>BatDongSan<span class="vip">VIP</span></h1>
+                </div>
+                <p class="tagline">Tham gia cộng đồng BĐS hàng đầu Việt Nam</p>
+                <div class="benefits">
+                    <div class="benefit-item">
+                        <span class="benefit-icon">✨</span>
+                        <div>
+                            <h4>Đăng tin miễn phí</h4>
+                            <p>Đăng tin bất động sản không giới hạn</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📊</span>
+                        <div>
+                            <h4>Quản lý thông minh</h4>
+                            <p>Theo dõi và quản lý BĐS dễ dàng</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">🤝</span>
+                        <div>
+                            <h4>Kết nối nhanh chóng</h4>
+                            <p>Liên hệ trực tiếp với khách hàng</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Register Form -->
+        <div class="register-form-wrapper">
+            <div class="register-form-container">
+                <h2>Tạo Tài Khoản</h2>
+                <p class="register-subtitle">Bắt đầu hành trình với BĐS VIP ngay hôm nay!</p>
+
+                <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">
+                                <span class="label-icon">👤</span>
+                                Họ và tên
+                            </label>
+                            <input type="text" id="fullName" formControlName="fullName" placeholder="Nhập họ và tên">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            <span class="label-icon">📧</span>
+                            Email
+                        </label>
+                        <input type="email" id="email" formControlName="email" placeholder="example@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">
+                            <span class="label-icon">📱</span>
+                            Số điện thoại
+                        </label>
+                        <input type="tel" id="phone" formControlName="phone" placeholder="0901 234 567">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <span class="label-icon">🔐</span>
+                            Mật khẩu
+                        </label>
+                        <input type="password" id="password" formControlName="password" placeholder="Tối thiểu 6 ký tự">
+                    </div>
+
+                    <div class="terms">
+                        <label class="checkbox-label">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            Tôi đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a>
+                        </label>
+                    </div>
+
+                    <div class="error-message global-error" *ngIf="errorMsg">
+                        <span>❌</span> {{ errorMsg }}
+                    </div>
+
+                    <button type="submit" class="btn-register" [disabled]="registerForm.invalid">
+                        <span class="btn-text">Đăng Ký Ngay</span>
+                        <span class="btn-icon">🚀</span>
+                    </button>
+                </form>
+
+                <p class="login-link">
+                    Đã có tài khoản?
+                    <a routerLink="/login">Đăng nhập</a>
+                </p>
+            </div>
+        </div>
     </div>
-
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
-      <div class="form-group">
-        <label for="fullName">👤 Họ Tên</label>
-        <input
-          id="fullName"
-          type="text"
-          formControlName="fullName"
-          placeholder="Nhập họ tên đầy đủ"
-          class="form-input"
-          [class.error]="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched"
-        />
-        <div *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched" class="error-message">
-          ⚠️ Họ tên là bắt buộc
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="email">📧 Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="Nhập email"
-          class="form-input"
-          [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
-        />
-        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
-          ⚠️ Vui lòng nhập email hợp lệ
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="password">🔑 Mật Khẩu</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="Tối thiểu 6 ký tự"
-          class="form-input"
-          [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
-        />
-        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
-          <span *ngIf="registerForm.get('password')?.errors?.['required']">⚠️ Mật khẩu là bắt buộc</span>
-          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">⚠️ Mật khẩu phải từ 6 ký tự</span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="phone">📱 Số Điện Thoại (Tùy Chọn)</label>
-        <input
-          id="phone"
-          type="text"
-          formControlName="phone"
-          placeholder="Nhập số điện thoại"
-          class="form-input"
-        />
-      </div>
-
-      <div *ngIf="errorMsg" class="alert alert-danger">
-        ❌ {{ errorMsg }}
-      </div>
-
-      <button type="submit" [disabled]="registerForm.invalid" class="btn btn-primary btn-large">
-        Đăng Ký
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      <p>Đã có tài khoản? <a routerLink="/login" class="link-highlight">Đăng nhập</a></p>
-    </div>
-  </div>
 </div>

@@ -10,6 +10,7 @@ export interface Appointment {
     scheduledAt?: string;
     message?: string;
     propertyId?: number;
+    customerId?: number | null;
     status?: string;
     createdAt?: Date;
     listing?: {
@@ -18,6 +19,11 @@ export interface Appointment {
         property?: {
             id: number;
             title: string;
+            owner?: {
+                id: number;
+                fullName: string;
+                phone?: string;
+            };
         };
     };
 }
@@ -52,6 +58,16 @@ export class AppointmentService {
     // Get count of pending appointments (for badge)
     getMyCount(): Observable<AppointmentCount> {
         return this.http.get<AppointmentCount>(`${this.apiUrl}/my/count`, { headers: this.getHeaders() });
+    }
+
+    // Get received appointments for current user's properties
+    getReceivedAppointments(): Observable<Appointment[]> {
+        return this.http.get<Appointment[]>(`${this.apiUrl}/received`, { headers: this.getHeaders() });
+    }
+
+    // Get appointments sent by current user
+    getSentAppointments(): Observable<Appointment[]> {
+        return this.http.get<Appointment[]>(`${this.apiUrl}/sent`, { headers: this.getHeaders() });
     }
 
     // Confirm an appointment

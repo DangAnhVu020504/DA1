@@ -33,6 +33,7 @@ export class PropertyCreateComponent implements OnInit {
     selectedCityId: number | null = null;
 
     selectedFile: File | null = null;
+    selectedVideoFile: File | null = null;
     loading = false;
     error = '';
 
@@ -67,6 +68,10 @@ export class PropertyCreateComponent implements OnInit {
         this.selectedFile = event.target.files[0];
     }
 
+    onVideoSelected(event: any) {
+        this.selectedVideoFile = event.target.files[0];
+    }
+
     async onSubmit() {
         this.loading = true;
         this.error = '';
@@ -76,6 +81,12 @@ export class PropertyCreateComponent implements OnInit {
             if (this.selectedFile) {
                 const uploadRes = await this.propertyService.uploadImage(this.selectedFile).toPromise();
                 this.property.imageUrl = uploadRes.url;
+            }
+
+            // Upload video if selected
+            if (this.selectedVideoFile) {
+                const videoRes = await this.propertyService.uploadVideo(this.selectedVideoFile).toPromise();
+                this.property.videoUrl = videoRes.url;
             }
 
             // Create property
@@ -90,7 +101,7 @@ export class PropertyCreateComponent implements OnInit {
                 }
             });
         } catch (err) {
-            this.error = 'Không thể upload ảnh';
+            this.error = 'Không thể upload file';
             this.loading = false;
         }
     }
@@ -99,3 +110,4 @@ export class PropertyCreateComponent implements OnInit {
         this.router.navigate(['/home']);
     }
 }
+

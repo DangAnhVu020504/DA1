@@ -6,7 +6,20 @@
         </button>
     </div>
 
-    <!-- Inline Form -->
+    <!-- Search & Filter Bar -->
+    <div *ngIf="!showForm && properties.length > 0" class="filter-bar">
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+            placeholder="🔍 Tìm theo tiêu đề, địa chỉ..." class="search-input">
+
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()" class="status-select">
+            <option value="all">📋 Tất cả trạng thái</option>
+            <option value="available">✅ Đang hiển thị</option>
+            <option value="sold">🏷️ Đã bán</option>
+            <option value="rented">🔑 Đã cho thuê</option>
+        </select>
+
+        <span class="result-count">{{ filteredProperties.length }} / {{ properties.length }} tin</span>
+    </div> <!-- Inline Form -->
     <div *ngIf="showForm" class="property-form-container">
         <div class="form-header">
             <h2>{{ isEditing ? '✏️ Sửa Bất động sản' : '➕ Tạo BDS mới' }}</h2>
@@ -135,9 +148,9 @@
     </div>
 
     <!-- Property Grid -->
-    <div *ngIf="!loading && !showForm && properties.length > 0" class="property-grid">
-        <div *ngFor="let prop of properties" class="property-card">
-            <div class="property-image">
+    <div *ngIf="!loading && !showForm && filteredProperties.length > 0" class="property-grid">
+        <div *ngFor="let prop of filteredProperties" class="property-card">
+            <div class="property-image clickable" (click)="viewPropertyDetail(prop.id!)">
                 <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/default-property.jpg'"
                     alt="property">
                 <span class="status-badge" [class]="prop.status">
@@ -146,7 +159,7 @@
             </div>
 
             <div class="property-content">
-                <h3 class="property-title">{{ prop.title }}</h3>
+                <h3 class="property-title clickable" (click)="viewPropertyDetail(prop.id!)">{{ prop.title }}</h3>
                 <p class="property-address">📍 {{ prop.address }}</p>
                 <p class="property-price">💰 {{ prop.price | number }} VNĐ</p>
 
@@ -158,15 +171,33 @@
             </div>
 
             <div class="property-actions">
+                <button class="btn-action btn-view" (click)="viewPropertyDetail(prop.id!)" title="Xem chi tiết">
+                    👁️ Xem
+                </button>
                 <button class="btn-action btn-edit" (click)="openEditForm(prop)" title="Sửa">
                     ✏️ Sửa
                 </button>
                 <button class="btn-action btn-delete" (click)="deleteProperty(prop.id!)" title="Xóa">
                     🗑️ Xóa
                 </button>
+            </div>
+            <div class="property-status-actions">
                 <button class="btn-action btn-publish" (click)="publishProperty(prop.id!)"
-                    [disabled]="prop.status === 'available'" title="Đăng tin">
+                    *ngIf="prop.status !== 'available' && prop.status !== 'sold' && prop.status !== 'rented'"
+                    title="Đăng tin">
                     📢 Đăng tin
+                </button>
+                <button class="btn-action btn-unpublish" (click)="unpublishProperty(prop.id!)"
+                    *ngIf="prop.status === 'available'" title="Gỡ tin đăng">
+                    🚫 Gỡ tin
+                </button>
+                <button class="btn-action btn-sold" (click)="markAsSold(prop.id!)" *ngIf="prop.status !== 'sold'"
+                    title="Đánh dấu đã bán">
+                    🏷️ Đã bán
+                </button>
+                <button class="btn-action btn-rented" (click)="markAsRented(prop.id!)" *ngIf="prop.status !== 'rented'"
+                    title="Đánh dấu đã cho thuê">
+                    🔑 Đã cho thuê
                 </button>
             </div>
         </div>

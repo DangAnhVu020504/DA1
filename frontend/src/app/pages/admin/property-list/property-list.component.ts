@@ -34,6 +34,10 @@ export class AdminPropertyListComponent implements OnInit {
         this.router.navigate(['/admin/properties/edit', id]);
     }
 
+    viewPropertyDetail(id: number) {
+        this.router.navigate(['/properties', id]);
+    }
+
     deleteProperty(id: number) {
         if (confirm('Bạn có chắc muốn xóa tin đăng này?')) {
             this.propertyService.delete(id).subscribe({

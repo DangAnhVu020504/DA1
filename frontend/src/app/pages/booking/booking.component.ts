@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppointmentService } from '../../services/appointment.service';
 import { PropertyService, Property } from '../../services/property.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-booking',
@@ -15,6 +16,7 @@ import { PropertyService, Property } from '../../services/property.service';
 export class BookingComponent implements OnInit {
     propertyId: number | null = null;
     property: Property | null = null;
+    currentUserId: number | null = null;
 
     booking = {
         fullName: '',
@@ -31,7 +33,8 @@ export class BookingComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private appointmentService: AppointmentService,
-        private propertyService: PropertyService
+        private propertyService: PropertyService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -40,6 +43,15 @@ export class BookingComponent implements OnInit {
             this.propertyId = +id;
             this.loadProperty();
         }
+
+        // Get current user ID
+        this.authService.currentUser$.subscribe(user => {
+            if (user) {
+                this.currentUserId = user.id;
+                // Pre-fill form with user info
+                this.booking.fullName = user.fullName || '';
+            }
+        });
     }
 
     loadProperty() {
@@ -59,7 +71,8 @@ export class BookingComponent implements OnInit {
 
         this.appointmentService.create({
             ...this.booking,
-            propertyId: this.propertyId
+            propertyId: this.propertyId,
+            customerId: this.currentUserId
         }).subscribe({
             next: () => {
                 this.success = true;
@@ -81,3 +94,4 @@ export class BookingComponent implements OnInit {
         }
     }
 }
+

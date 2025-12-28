@@ -9,6 +9,15 @@
             <div class="image-section">
                 <img [src]="property.imageUrl ? 'http://localhost:3000' + property.imageUrl : 'assets/house-placeholder.jpg'"
                     alt="{{ property.title }}" class="main-image">
+
+                <!-- Video Section -->
+                <div class="video-section" *ngIf="property.videoUrl">
+                    <h3>🎬 Video giới thiệu</h3>
+                    <video controls class="property-video">
+                        <source [src]="'http://localhost:3000' + property.videoUrl" type="video/mp4">
+                        Trình duyệt của bạn không hỗ trợ video.
+                    </video>
+                </div>
             </div>
 
             <div class="info-section">

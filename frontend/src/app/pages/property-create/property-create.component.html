@@ -97,6 +97,14 @@
             </div>
         </div>
 
+        <div class="form-row">
+            <div class="form-group">
+                <label>🎬 Video giới thiệu (MP4, WebM, MOV - tối đa 100MB)</label>
+                <input type="file" (change)="onVideoSelected($event)"
+                    accept="video/mp4,video/webm,video/quicktime,video/avi" class="form-control-file">
+            </div>
+        </div>
+
         <div class="actions">
             <button type="submit" [disabled]="!form.valid || loading" class="btn btn-primary">
                 {{ loading ? 'Đang xử lý...' : '📤 Đăng Tin' }}

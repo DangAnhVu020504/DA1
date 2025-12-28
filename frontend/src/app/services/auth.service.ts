@@ -19,6 +19,10 @@ export class AuthService {
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
+    // Thêm trạng thái loading để Auth Guard biết khi nào đã load xong
+    private isLoadingSubject = new BehaviorSubject<boolean>(true);
+    public isLoading$ = this.isLoadingSubject.asObservable();
+
     constructor(private http: HttpClient) {
         this.loadUserFromToken();
     }
@@ -29,11 +33,16 @@ export class AuthService {
             this.getProfile().subscribe({
                 next: (user) => {
                     this.currentUserSubject.next(user);
+                    this.isLoadingSubject.next(false);
                 },
                 error: () => {
                     this.logout();
+                    this.isLoadingSubject.next(false);
                 }
             });
+        } else {
+            // Không có token, đánh dấu loading xong ngay
+            this.isLoadingSubject.next(false);
         }
     }
 
@@ -42,6 +51,8 @@ export class AuthService {
             tap((response: any) => {
                 if (response.access_token) {
                     localStorage.setItem('token', response.access_token);
+                    // Không cần set isLoading = true vì sẽ load ngay
+                    this.isLoadingSubject.next(true);
                     this.loadUserFromToken();
                 }
             })
@@ -65,5 +76,9 @@ export class AuthService {
 
     isLoggedIn(): boolean {
         return !!this.currentUserSubject.value;
+    }
+
+    updateCurrentUser(user: User) {
+        this.currentUserSubject.next(user);
     }
 }

@@ -1,0 +1,69 @@
+<div class="favorites-container">
+    <h1 class="page-title">❤️ Tin Yêu Thích</h1>
+
+    <!-- Search & Filter Bar -->
+    <div *ngIf="!loading && favorites.length > 0" class="filter-bar">
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+            placeholder="🔍 Tìm theo tiêu đề, địa chỉ..." class="search-input">
+
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onTypeFilterChange()" class="type-select">
+            <option value="all">📋 Tất cả loại</option>
+            <option value="sale">🏷️ Nhà bán</option>
+            <option value="rent">🔑 Cho thuê</option>
+        </select>
+
+        <span class="result-count">{{ filteredFavorites.length }} / {{ favorites.length }} tin</span>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+        <p>Đang tải...</p>
+    </div>
+
+    <div *ngIf="!loading && favorites.length === 0" class="empty-state">
+        <div class="empty-icon">💔</div>
+        <h2>Chưa có tin yêu thích</h2>
+        <p>Hãy thêm tin yêu thích bằng cách nhấn vào nút ❤️ trên các tin BĐS</p>
+        <a routerLink="/home" class="btn-home">🏠 Về trang chủ</a>
+    </div>
+
+    <div *ngIf="!loading && filteredFavorites.length > 0" class="property-grid">
+        <div *ngFor="let fav of filteredFavorites" class="property-card">
+            <div class="card-image-container" [routerLink]="['/properties', getProperty(fav)?.id]"
+                style="cursor: pointer;">
+                <img [src]="getProperty(fav)?.imageUrl ? 'http://localhost:3000' + getProperty(fav)?.imageUrl : 'assets/house-placeholder.jpg'"
+                    alt="Property Image" class="property-img">
+                <button class="heart-btn liked" (click)="removeFavorite(fav.propertyId, $event)" title="Bỏ yêu thích">
+                    ❤️
+                </button>
+            </div>
+            <div class="property-info" [routerLink]="['/properties', getProperty(fav)?.id]" style="cursor: pointer;">
+                <span class="type-badge" [ngClass]="getProperty(fav)?.listingType?.code === 'rent' ? 'rent' : 'sale'">
+                    {{ getProperty(fav)?.listingType?.name || 'Bất động sản' }}
+                </span>
+                <h3>{{ getProperty(fav)?.title }}</h3>
+                <p class="price">{{ getProperty(fav)?.price | number }} VND</p>
+                <p class="address">📍 {{ getProperty(fav)?.address }}</p>
+                <p class="area" *ngIf="getProperty(fav)?.area">📐 {{ getProperty(fav)?.area }} m²</p>
+                <p class="location" *ngIf="getProperty(fav)?.district">
+                    🏙️ {{ getProperty(fav)?.district?.name }}<span *ngIf="getProperty(fav)?.district?.city">, {{
+                        getProperty(fav)?.district?.city?.name }}</span>
+                </p>
+            </div>
+            <div class="poster-info" *ngIf="getProperty(fav)?.owner">
+                <img [src]="getProperty(fav)?.owner?.avatar ? 'http://localhost:3000' + getProperty(fav)?.owner?.avatar : 'assets/default-avatar.png'"
+                    alt="Poster Avatar" class="poster-avatar">
+                <div class="poster-details">
+                    <span class="poster-name">{{ getProperty(fav)?.owner?.fullName }}</span>
+                    <span class="poster-phone" *ngIf="getProperty(fav)?.owner?.phone">📞 {{
+                        getProperty(fav)?.owner?.phone }}</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button [routerLink]="['/booking', getProperty(fav)?.id]" class="btn-booking"
+                    (click)="$event.stopPropagation()">
+                    📅 Đặt lịch / Liên hệ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

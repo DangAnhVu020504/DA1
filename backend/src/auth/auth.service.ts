@@ -40,4 +40,48 @@ export class AuthService {
         const { passwordHash, ...result } = newUser;
         return result;
     }
+
+    async changePassword(userId: number, oldPassword: string, newPassword: string) {
+        const user = await this.usersService.findOne(userId);
+        if (!user) {
+            throw new UnauthorizedException('User not found');
+        }
+
+        // Verify old password
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.passwordHash);
+        if (!isPasswordValid) {
+            throw new UnauthorizedException('Old password is incorrect');
+        }
+
+        // Hash new password
+        const salt = await bcrypt.genSalt();
+        const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+        // Update password
+        await this.usersService.updatePassword(userId, newPasswordHash);
+
+        return { message: 'Password changed successfully' };
+    }
+
+    async resetPassword(email: string, phone: string, newPassword: string) {
+        // Find user by email
+        const user = await this.usersService.findOneByEmail(email);
+        if (!user) {
+            throw new UnauthorizedException('User not found');
+        }
+
+        // Verify phone matches
+        if (user.phone !== phone) {
+            throw new UnauthorizedException('Phone number does not match');
+        }
+
+        // Hash new password
+        const salt = await bcrypt.genSalt();
+        const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+        // Update password
+        await this.usersService.updatePassword(user.id, newPasswordHash);
+
+        return { message: 'Password reset successfully' };
+    }
 }

@@ -14,7 +14,12 @@ import { LookupService, City, District, PropertyType, ListingType } from '../../
 })
 export class MyPropertiesComponent implements OnInit {
     properties: Property[] = [];
+    filteredProperties: Property[] = [];
     loading = true;
+
+    // Search and filter
+    searchTerm = '';
+    statusFilter = 'all'; // 'all', 'available', 'draft'
 
     // Form state
     showForm = false;
@@ -78,6 +83,7 @@ export class MyPropertiesComponent implements OnInit {
         this.propertyService.getMyProperties().subscribe({
             next: (data) => {
                 this.properties = data;
+                this.applyFilters();
                 this.loading = false;
             },
             error: (err) => {
@@ -85,6 +91,34 @@ export class MyPropertiesComponent implements OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    applyFilters() {
+        let result = [...this.properties];
+
+        // Filter by status
+        if (this.statusFilter !== 'all') {
+            result = result.filter(p => p.status === this.statusFilter);
+        }
+
+        // Filter by search term
+        if (this.searchTerm.trim()) {
+            const term = this.searchTerm.toLowerCase();
+            result = result.filter(p =>
+                p.title.toLowerCase().includes(term) ||
+                p.address.toLowerCase().includes(term)
+            );
+        }
+
+        this.filteredProperties = result;
+    }
+
+    onSearchChange() {
+        this.applyFilters();
+    }
+
+    onStatusFilterChange() {
+        this.applyFilters();
     }
 
     // Form methods
@@ -220,6 +254,55 @@ export class MyPropertiesComponent implements OnInit {
                 alert('Đăng tin thất bại!');
             }
         });
+    }
+
+    unpublishProperty(id: number) {
+        if (confirm('Bạn có chắc muốn gỡ tin này? Tin sẽ không hiển thị trên trang chủ.')) {
+            this.propertyService.update(id, { status: 'draft' }).subscribe({
+                next: () => {
+                    this.loadProperties();
+                    alert('Gỡ tin thành công!');
+                },
+                error: (err) => {
+                    console.error('Failed to unpublish:', err);
+                    alert('Gỡ tin thất bại!');
+                }
+            });
+        }
+    }
+
+    markAsSold(id: number) {
+        if (confirm('Bạn có chắc muốn đánh dấu BĐS này đã bán? Tin sẽ không hiển thị trên trang chủ.')) {
+            this.propertyService.update(id, { status: 'sold' }).subscribe({
+                next: () => {
+                    this.loadProperties();
+                    alert('Đã đánh dấu: Đã bán!');
+                },
+                error: (err) => {
+                    console.error('Failed to mark as sold:', err);
+                    alert('Thao tác thất bại!');
+                }
+            });
+        }
+    }
+
+    markAsRented(id: number) {
+        if (confirm('Bạn có chắc muốn đánh dấu BĐS này đã cho thuê? Tin sẽ không hiển thị trên trang chủ.')) {
+            this.propertyService.update(id, { status: 'rented' }).subscribe({
+                next: () => {
+                    this.loadProperties();
+                    alert('Đã đánh dấu: Đã cho thuê!');
+                },
+                error: (err) => {
+                    console.error('Failed to mark as rented:', err);
+                    alert('Thao tác thất bại!');
+                }
+            });
+        }
+    }
+
+    viewPropertyDetail(id: number) {
+        this.router.navigate(['/properties', id]);
     }
 
     getStatusLabel(status: string): string {

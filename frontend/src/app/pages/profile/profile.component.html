@@ -1,118 +1,241 @@
-<div class="profile-container">
-  <div *ngIf="loading" class="loading-spinner">
-    <div class="spinner"></div>
-    <p>Đang tải hồ sơ...</p>
-  </div>
-
-  <div *ngIf="error && !loading" class="alert alert-danger">
-    <p>{{ error }}</p>
-  </div>
-
-  <div *ngIf="user && !loading" class="profile-card">
-    <div class="profile-header">
-      <div class="profile-avatar-container" (click)="triggerFileInput(fileInput)">
-        <img [src]="getAvatarUrl()" alt="Avatar" class="profile-avatar-img">
-        <div class="avatar-overlay">
-          <span>📷 Đổi hình nền</span>
-        </div>
-        <input #fileInput type="file" (change)="onFileSelected($event)" style="display: none" accept="image/*">
-      </div>
-
-      <div class="profile-info-right">
-        <h1 class="profile-name">{{ user.fullName }}</h1>
-        <span [ngClass]="'badge ' + getRoleBadgeClass(user.role)">
-          {{ getRoleLabel(user.role) }}
-        </span>
-      </div>
-    </div>
-
-    <div class="profile-content">
-      <div class="profile-section">
-        <div class="section-header">
-          <h3>Thông Tin Cá Nhân</h3>
-          <button *ngIf="!isEditing" class="btn btn-edit" (click)="toggleEdit()">
-            ✏️ Chỉnh sửa
-          </button>
-        </div>
-
-        <!-- View Mode -->
-        <div *ngIf="!isEditing" class="info-grid">
-          <div class="info-item">
-            <label>📧 Email</label>
-            <p>{{ user.email }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>🆔 ID</label>
-            <p>#{{ user.userId || user.id }}</p>
-          </div>
-
-          <div *ngIf="user.phone" class="info-item">
-            <label>📱 Số Điện Thoại</label>
-            <p>{{ user.phone }}</p>
-          </div>
-
-          <div class="info-item">
-            <label>👥 Vai Trò</label>
-            <p>{{ getRoleLabel(user.role) }}</p>
-          </div>
-
-          <div *ngIf="user.createdAt" class="info-item">
-            <label>📅 Ngày Tạo Tài Khoản</label>
-            <p>{{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
-          </div>
-
-          <div *ngIf="user.updatedAt" class="info-item">
-            <label>🔄 Cập Nhật Lần Cuối</label>
-            <p>{{ user.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
-          </div>
-        </div>
-
-        <!-- Edit Mode -->
-        <div *ngIf="isEditing" class="edit-form">
-          <div class="form-group">
-            <label>📝 Họ và Tên</label>
-            <input type="text" class="edit-input" [(ngModel)]="editForm.fullName" placeholder="Nhập họ và tên">
-          </div>
-
-          <div class="form-group">
-            <label>📧 Email</label>
-            <input type="email" class="edit-input" [(ngModel)]="editForm.email" placeholder="Nhập email">
-          </div>
-
-          <div class="form-group">
-            <label>📱 Số Điện Thoại</label>
-            <input type="tel" class="edit-input" [(ngModel)]="editForm.phone" placeholder="Nhập số điện thoại">
-          </div>
-
-          <div class="form-group">
-            <label>👥 Vai Trò</label>
-            <div class="role-selector">
-              <button type="button" class="role-trigger" (click)="toggleRoleDropdown()">
-                {{ getSelectedRoleLabel() }}
-                <span class="dropdown-arrow">▼</span>
-              </button>
-              <div *ngIf="showRoleDropdown" class="role-dropdown">
-                <div *ngFor="let role of availableRoles" class="role-option"
-                  [class.selected]="editForm.role === role.value" (click)="selectRole(role.value)">
-                  {{ role.label }}
-                </div>
-              </div>
+<div class="profile-page">
+    <div class="profile-container" *ngIf="user">
+        <!-- Profile Header with Cover -->
+        <div class="profile-header">
+            <div class="header-cover">
+                <div class="cover-overlay"></div>
+                <div class="cover-pattern"></div>
             </div>
-          </div>
+            <div class="profile-card">
+                <div class="avatar-section">
+                    <div class="avatar-wrapper">
+                        <img [src]="user.avatar ? 'http://localhost:3000' + user.avatar : 'assets/default-avatar.png'"
+                            alt="Avatar" class="avatar-img">
+                        <button class="avatar-edit-btn" title="Thay đổi ảnh">
+                            <span>📷</span>
+                        </button>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="user-info">
+                        <h1>{{ user.fullName }}</h1>
+                        <p class="user-email">{{ user.email }}</p>
+                        <span class="role-badge" [ngClass]="user.role">
+                            {{ user.role === 'admin' ? '👑 Quản trị viên' : '👤 Thành viên' }}
+                        </span>
+                    </div>
+                </div>
 
-          <div class="edit-actions">
-            <button class="btn btn-success" (click)="saveProfile()">💾 Lưu</button>
-            <button class="btn btn-secondary" (click)="cancelEdit()">❌ Hủy</button>
-          </div>
+                <!-- Stats Section Inside Card -->
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ propertiesCount }}</span>
+                        <span class="stat-label">Tin đăng</span>
+                        <span class="stat-icon-bg">🏠</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ favoritesCount }}</span>
+                        <span class="stat-label">Yêu thích</span>
+                        <span class="stat-icon-bg">❤️</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ appointmentsCount }}</span>
+                        <span class="stat-label">Lịch hẹn</span>
+                        <span class="stat-icon-bg">📅</span>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="profile-actions">
-        <button class="btn btn-danger" (click)="logout()">
-          🚪 Đăng Xuất
-        </button>
-      </div>
+        <!-- Main Content Grid -->
+        <div class="profile-grid">
+            <!-- Left Column - Personal Info -->
+            <div class="profile-column">
+                <div class="info-card">
+                    <div class="card-header">
+                        <div class="header-icon">📋</div>
+                        <h2>Thông tin cá nhân</h2>
+                        <button class="btn-edit" (click)="toggleEdit()">
+                            {{ isEditing ? '✕ Hủy' : '✏️ Sửa' }}
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <div class="info-icon">👤</div>
+                            <div class="info-content">
+                                <label>Họ và tên</label>
+                                <input *ngIf="isEditing" type="text" [(ngModel)]="editData.fullName" class="form-input">
+                                <span *ngIf="!isEditing" class="info-value">{{ user.fullName }}</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">✉️</div>
+                            <div class="info-content">
+                                <label>Email</label>
+                                <input *ngIf="isEditing" type="email" [(ngModel)]="editData.email" disabled
+                                    class="form-input disabled">
+                                <span *ngIf="!isEditing" class="info-value">{{ user.email }}</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">📱</div>
+                            <div class="info-content">
+                                <label>Số điện thoại</label>
+                                <input *ngIf="isEditing" type="tel" [(ngModel)]="editData.phone"
+                                    placeholder="Nhập số điện thoại" class="form-input">
+                                <span *ngIf="!isEditing" class="info-value" [class.empty]="!user.phone">{{ user.phone ||
+                                    'Chưa cập nhật' }}</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">📍</div>
+                            <div class="info-content">
+                                <label>Địa chỉ</label>
+                                <input *ngIf="isEditing" type="text" [(ngModel)]="editData.address"
+                                    placeholder="Nhập địa chỉ" class="form-input">
+                                <span *ngIf="!isEditing" class="info-value" [class.empty]="!user.address">{{
+                                    user.address || 'Chưa cập nhật' }}</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">🎭</div>
+                            <div class="info-content">
+                                <label>Vai trò</label>
+                                <span class="info-value role-value">{{ user.role === 'admin' ? 'Quản trị viên' : 'Thành
+                                    viên' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons" *ngIf="isEditing">
+                            <button class="btn-cancel" (click)="toggleEdit()" [disabled]="isSaving">Hủy bỏ</button>
+                            <button class="btn-save" (click)="saveProfile()" [disabled]="isSaving">
+                                {{ isSaving ? '⏳ Đang lưu...' : '💾 Lưu thay đổi' }}
+                            </button>
+                        </div>
+                        <div class="save-message" *ngIf="saveMessage">{{ saveMessage }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Quick Actions & Security -->
+            <div class="profile-column">
+                <!-- Quick Actions Card -->
+                <div class="info-card actions-card">
+                    <div class="card-header">
+                        <div class="header-icon">⚡</div>
+                        <h2>Thao tác nhanh</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions-list">
+                            <a routerLink="/my-properties" class="action-item action-green">
+                                <span class="action-icon">🏠</span>
+                                <div class="action-content">
+                                    <span class="action-title">Quản lý BĐS</span>
+                                    <span class="action-desc">Xem và quản lý tin đăng của bạn</span>
+                                </div>
+                                <span class="action-arrow">→</span>
+                            </a>
+                            <a routerLink="/properties/create" class="action-item action-blue">
+                                <span class="action-icon">➕</span>
+                                <div class="action-content">
+                                    <span class="action-title">Đăng tin mới</span>
+                                    <span class="action-desc">Tạo tin đăng BĐS mới</span>
+                                </div>
+                                <span class="action-arrow">→</span>
+                            </a>
+                            <a routerLink="/favorites" class="action-item action-red">
+                                <span class="action-icon">❤️</span>
+                                <div class="action-content">
+                                    <span class="action-title">Tin yêu thích</span>
+                                    <span class="action-desc">Xem danh sách yêu thích</span>
+                                </div>
+                                <span class="action-arrow">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Card -->
+                <div class="info-card security-card">
+                    <div class="card-header">
+                        <div class="header-icon">🔒</div>
+                        <h2>Bảo mật</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="security-item" *ngIf="!showPasswordForm">
+                            <div class="security-icon">🔐</div>
+                            <div class="security-content">
+                                <span class="security-title">Đổi mật khẩu</span>
+                                <span class="security-desc">Cập nhật mật khẩu mới</span>
+                            </div>
+                            <button class="btn-security" (click)="togglePasswordForm()">Thay đổi</button>
+                        </div>
+
+                        <!-- Password Change Form -->
+                        <div *ngIf="showPasswordForm" class="password-form">
+                            <div class="form-header">
+                                <span class="form-icon">🔐</span>
+                                <h3>Đổi mật khẩu</h3>
+                                <button class="btn-close" (click)="togglePasswordForm()">✕</button>
+                            </div>
+                            <p class="form-notice">Vui lòng nhập đúng email và số điện thoại để xác minh danh tính</p>
+
+                            <div class="form-group">
+                                <label>✉️ Email xác minh</label>
+                                <input type="email" [(ngModel)]="passwordData.email" placeholder="Nhập email của bạn"
+                                    class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>📱 Số điện thoại xác minh</label>
+                                <input type="tel" [(ngModel)]="passwordData.phone" placeholder="Nhập số điện thoại"
+                                    class="form-input">
+                            </div>
+                            <div class="form-divider"></div>
+                            <div class="form-group">
+                                <label>🔑 Mật khẩu cũ</label>
+                                <input type="password" [(ngModel)]="passwordData.oldPassword"
+                                    placeholder="Nhập mật khẩu hiện tại" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>🔐 Mật khẩu mới</label>
+                                <input type="password" [(ngModel)]="passwordData.newPassword"
+                                    placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>✅ Xác nhận mật khẩu</label>
+                                <input type="password" [(ngModel)]="passwordData.confirmPassword"
+                                    placeholder="Nhập lại mật khẩu mới" class="form-input">
+                            </div>
+
+                            <div class="password-message" *ngIf="passwordMessage"
+                                [class.success]="passwordMessage.includes('✅')">
+                                {{ passwordMessage }}
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn-cancel" (click)="togglePasswordForm()">Hủy</button>
+                                <button class="btn-submit" (click)="changePassword()" [disabled]="isChangingPassword">
+                                    {{ isChangingPassword ? '⏳ Đang xử lý...' : '💾 Đổi mật khẩu' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="security-divider" *ngIf="!showPasswordForm"></div>
+                        <button class="btn-logout-full" (click)="logout()" *ngIf="!showPasswordForm">
+                            <span>🚪</span> Đăng xuất tài khoản
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Loading State -->
+    <div class="loading" *ngIf="!user">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Đang tải thông tin...</p>
+        </div>
+    </div>
 </div>

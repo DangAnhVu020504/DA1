@@ -1,148 +1,119 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import { PropertyService } from '../../services/property.service';
+import { FavoriteService } from '../../services/favorite.service';
+import { AppointmentService } from '../../services/appointment.service';
 import { UserService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule],
     templateUrl: './profile.component.html',
     styleUrl: './profile.css'
 })
 export class ProfileComponent implements OnInit {
     user: any;
-    loading: boolean = true;
-    error: string = '';
+    isEditing = false;
+    editData: any = {};
+    isSaving = false;
+    saveMessage = '';
 
-    // Edit mode state
-    isEditing: boolean = false;
-    showRoleDropdown: boolean = false;
-    editForm = {
-        fullName: '',
+    // Stats
+    propertiesCount = 0;
+    favoritesCount = 0;
+    appointmentsCount = 0;
+
+    // Password Change
+    showPasswordForm = false;
+    isChangingPassword = false;
+    passwordMessage = '';
+    passwordData = {
         email: '',
         phone: '',
-        role: ''
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: ''
     };
-
-    // Available roles for selection (excluding admin)
-    availableRoles = [
-        { value: 'customer', label: '👥 Người dùng' },
-        { value: 'agent', label: '🤝 Người môi giới' },
-        { value: 'owner', label: '🏠 Chủ bất động sản' }
-    ];
 
     constructor(
         private authService: AuthService,
+        private propertyService: PropertyService,
+        private favoriteService: FavoriteService,
+        private appointmentService: AppointmentService,
+        private userService: UserService,
         private router: Router,
-        private userService: UserService
+        private http: HttpClient
     ) { }
 
     ngOnInit() {
-        this.loadProfile();
-    }
-
-    loadProfile() {
-        this.loading = true;
         this.authService.getProfile().subscribe({
             next: (data) => {
                 this.user = data;
-                this.loading = false;
+                this.editData = { ...data };
+                this.loadStats();
             },
-            error: (err) => {
-                this.error = 'Không thể tải hồ sơ. Vui lòng đăng nhập lại.';
-                this.loading = false;
-                setTimeout(() => {
-                    this.router.navigate(['/login']);
-                }, 2000);
-            }
+            error: () => this.router.navigate(['/login'])
         });
     }
 
-    // Edit mode methods
-    toggleEdit() {
-        if (!this.isEditing) {
-            // Enter edit mode - copy current values
-            this.editForm.fullName = this.user.fullName;
-            this.editForm.email = this.user.email;
-            this.editForm.phone = this.user.phone || '';
-            this.editForm.role = this.user.role;
-        }
-        this.isEditing = !this.isEditing;
-        this.showRoleDropdown = false;
+    loadStats() {
+        // Load user's properties count
+        this.propertyService.getMyProperties().subscribe({
+            next: (props) => this.propertiesCount = props.length,
+            error: () => this.propertiesCount = 0
+        });
+
+        // Load user's favorites count
+        this.favoriteService.getAll().subscribe({
+            next: (favs) => this.favoritesCount = favs.length,
+            error: () => this.favoritesCount = 0
+        });
+
+        // Load user's appointments count
+        this.appointmentService.getMyAppointments().subscribe({
+            next: (apps) => this.appointmentsCount = apps.length,
+            error: () => this.appointmentsCount = 0
+        });
     }
 
-    cancelEdit() {
-        this.isEditing = false;
-        this.showRoleDropdown = false;
+    toggleEdit() {
+        this.isEditing = !this.isEditing;
+        this.saveMessage = '';
+        if (!this.isEditing) {
+            this.editData = { ...this.user };
+        }
     }
 
     saveProfile() {
+        this.isSaving = true;
+        this.saveMessage = '';
+
         const updateData = {
-            fullName: this.editForm.fullName,
-            email: this.editForm.email,
-            phone: this.editForm.phone,
-            role: this.editForm.role
+            fullName: this.editData.fullName,
+            phone: this.editData.phone,
+            address: this.editData.address
         };
 
-        const userId = this.user.userId || this.user.id;
-        this.userService.update(userId, updateData).subscribe({
+        this.userService.update(this.user.id, updateData).subscribe({
             next: (updatedUser) => {
-                this.user.fullName = this.editForm.fullName;
-                this.user.email = this.editForm.email;
-                this.user.phone = this.editForm.phone;
-                this.user.role = this.editForm.role;
+                this.user = { ...this.user, ...updateData };
+                this.authService.updateCurrentUser(this.user);
                 this.isEditing = false;
-                this.showRoleDropdown = false;
-                alert('Cập nhật hồ sơ thành công!');
+                this.isSaving = false;
+                this.saveMessage = '✅ Cập nhật thành công!';
+                setTimeout(() => this.saveMessage = '', 3000);
             },
             error: (err) => {
-                console.error('Update failed:', err);
-                alert('Cập nhật thất bại: ' + (err.error?.message || err.statusText || 'Lỗi không xác định'));
+                console.error('Failed to save profile:', err);
+                this.isSaving = false;
+                this.saveMessage = '❌ Lỗi khi lưu thông tin!';
             }
         });
-    }
-
-    toggleRoleDropdown() {
-        this.showRoleDropdown = !this.showRoleDropdown;
-    }
-
-    selectRole(role: string) {
-        this.editForm.role = role;
-        this.showRoleDropdown = false;
-    }
-
-    getSelectedRoleLabel(): string {
-        const found = this.availableRoles.find(r => r.value === this.editForm.role);
-        return found ? found.label : this.editForm.role;
-    }
-
-    onFileSelected(event: any) {
-        const file: File = event.target.files[0];
-        if (file) {
-            this.userService.uploadAvatar(file).subscribe({
-                next: (res) => {
-                    this.user.avatar = res.avatar;
-                },
-                error: (err) => {
-                    console.error('Upload failed:', err);
-                    alert('Failed to upload avatar: ' + (err.error?.message || err.statusText || 'Unknown error'));
-                }
-            });
-        }
-    }
-
-    getAvatarUrl(): string {
-        if (this.user && this.user.avatar) {
-            return `http://localhost:3000${this.user.avatar}`;
-        }
-        return 'assets/default-avatar.png';
-    }
-
-    triggerFileInput(fileInput: HTMLInputElement) {
-        fileInput.click();
     }
 
     logout() {
@@ -150,23 +121,80 @@ export class ProfileComponent implements OnInit {
         this.router.navigate(['/login']);
     }
 
-    getRoleLabel(role: string): string {
-        const roleLabels: { [key: string]: string } = {
-            admin: '👨‍💼 Quản Trị Viên',
-            owner: '🏠 Chủ bất động sản',
-            agent: '🤝 Người môi giới',
-            customer: '👥 Người dùng'
-        };
-        return roleLabels[role] || role;
+    // Password Change Methods
+    togglePasswordForm() {
+        this.showPasswordForm = !this.showPasswordForm;
+        this.passwordMessage = '';
+        if (!this.showPasswordForm) {
+            this.resetPasswordForm();
+        }
     }
 
-    getRoleBadgeClass(role: string): string {
-        const classes: { [key: string]: string } = {
-            admin: 'badge-primary',
-            owner: 'badge-success',
-            agent: 'badge-info',
-            customer: 'badge-secondary'
+    resetPasswordForm() {
+        this.passwordData = {
+            email: '',
+            phone: '',
+            oldPassword: '',
+            newPassword: '',
+            confirmPassword: ''
         };
-        return classes[role] || 'badge-secondary';
+        this.passwordMessage = '';
+    }
+
+    changePassword() {
+        this.passwordMessage = '';
+
+        // Validate email matches
+        if (this.passwordData.email !== this.user.email) {
+            this.passwordMessage = '❌ Email không khớp với tài khoản!';
+            return;
+        }
+
+        // Validate phone matches
+        if (this.passwordData.phone !== this.user.phone) {
+            this.passwordMessage = '❌ Số điện thoại không khớp với tài khoản!';
+            return;
+        }
+
+        // Validate new password
+        if (!this.passwordData.newPassword || this.passwordData.newPassword.length < 6) {
+            this.passwordMessage = '❌ Mật khẩu mới phải có ít nhất 6 ký tự!';
+            return;
+        }
+
+        // Validate confirm password
+        if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
+            this.passwordMessage = '❌ Xác nhận mật khẩu không khớp!';
+            return;
+        }
+
+        this.isChangingPassword = true;
+
+        const token = localStorage.getItem('token');
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+        this.http.post('http://localhost:3000/auth/change-password', {
+            oldPassword: this.passwordData.oldPassword,
+            newPassword: this.passwordData.newPassword
+        }, { headers }).subscribe({
+            next: () => {
+                this.passwordMessage = '✅ Đổi mật khẩu thành công!';
+                this.isChangingPassword = false;
+                setTimeout(() => {
+                    this.togglePasswordForm();
+                }, 2000);
+            },
+            error: (err) => {
+                this.isChangingPassword = false;
+                if (err.status === 401) {
+                    this.passwordMessage = '❌ Mật khẩu cũ không đúng!';
+                } else {
+                    this.passwordMessage = '❌ Lỗi khi đổi mật khẩu!';
+                }
+            }
+        });
     }
 }
+
+
+

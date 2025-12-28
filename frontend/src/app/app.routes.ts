@@ -15,6 +15,9 @@ import { PropertyCreateComponent } from './pages/property-create/property-create
 import { PropertyDetailComponent } from './pages/property-detail/property-detail.component';
 import { BookingComponent } from './pages/booking/booking.component';
 import { MyPropertiesComponent } from './pages/my-properties/my-properties.component';
+import { FavoritesComponent } from './pages/favorites/favorites.component';
+import { MyAppointmentsComponent } from './pages/my-appointments/my-appointments.component';
+import { NewsComponent } from './pages/news/news.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -27,6 +30,9 @@ export const routes: Routes = [
     { path: 'properties/create', component: PropertyCreateComponent, canActivate: [authGuard] },
     { path: 'properties/:id', component: PropertyDetailComponent, canActivate: [authGuard] },
     { path: 'booking/:propertyId', component: BookingComponent, canActivate: [authGuard] },
+    { path: 'favorites', component: FavoritesComponent, canActivate: [authGuard] },
+    { path: 'my-appointments', component: MyAppointmentsComponent, canActivate: [authGuard] },
+    { path: 'news', component: NewsComponent, canActivate: [authGuard] },
     {
         path: 'admin',
         component: AdminComponent,

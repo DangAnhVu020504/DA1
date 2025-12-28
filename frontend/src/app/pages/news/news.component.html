@@ -1,0 +1,74 @@
+<div class="news-page">
+    <div class="news-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <span class="header-icon">📰</span>
+                <div class="header-text">
+                    <h1>Tin tức Bất động sản</h1>
+                    <p class="subtitle">Cập nhật những thông tin mới nhất về thị trường bất động sản</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="article-count" *ngIf="!loading && articles.length > 0">
+                    📊 {{ articles.length }}/{{ totalResults }} bài viết
+                </span>
+                <button class="btn-refresh" (click)="loadNews()" [disabled]="loading">
+                    🔄 Làm mới
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Đang tải tin tức...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error && !loading" class="error-container">
+            <span class="error-icon">⚠️</span>
+            <p>{{ error }}</p>
+            <button class="btn-retry" (click)="loadNews()">Thử lại</button>
+        </div>
+
+        <!-- News Grid -->
+        <div *ngIf="!loading && !error" class="news-grid">
+            <article *ngFor="let article of articles" class="news-card" (click)="openArticle(article.url)">
+                <div class="card-image">
+                    <img [src]="article.image || getDefaultImage()" [alt]="article.title"
+                        (error)="onImageError($event)">
+                    <div class="card-source">{{ article.source }}</div>
+                </div>
+                <div class="card-content">
+                    <h2 class="card-title">{{ article.title }}</h2>
+                    <p class="card-description" *ngIf="article.description">
+                        {{ article.description }}
+                    </p>
+                    <div class="card-meta">
+                        <span class="meta-time">🕐 {{ getTimeAgo(article.publishedAt) }}</span>
+                        <span class="meta-author" *ngIf="article.author">✍️ {{ article.author }}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="read-more">Đọc thêm →</span>
+                </div>
+            </article>
+        </div>
+
+        <!-- Load More Button -->
+        <div *ngIf="!loading && !error && articles.length > 0 && hasMoreArticles" class="load-more-container">
+            <button class="btn-load-more" (click)="loadMoreNews()" [disabled]="loadingMore">
+                <span *ngIf="!loadingMore">📥 Xem thêm tin tức</span>
+                <span *ngIf="loadingMore">⏳ Đang tải...</span>
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && !error && articles.length === 0" class="empty-container">
+            <span class="empty-icon">📭</span>
+            <h2>Chưa có tin tức</h2>
+            <p>Hiện tại chưa có tin tức nào. Vui lòng quay lại sau.</p>
+        </div>
+    </div>
+</div>

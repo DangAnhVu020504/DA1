@@ -16,6 +16,7 @@ export interface Property {
     status?: string;
     createdAt?: Date;
     imageUrl?: string; // Thumbnail image URL
+    videoUrl?: string; // Video URL
     // Relations
     owner?: any;
     user?: any; // Alias for owner (for backward compatibility)
@@ -40,12 +41,29 @@ export class PropertyService {
         return new HttpHeaders().set('Authorization', `Bearer ${token}`);
     }
 
-    findAll(filters?: { search?: string; listingTypeId?: number; minPrice?: number; maxPrice?: number }): Observable<Property[]> {
+    findAll(filters?: {
+        search?: string;
+        listingTypeId?: number;
+        minPrice?: number;
+        maxPrice?: number;
+        cityId?: number;
+        districtId?: number;
+        minArea?: number;
+        maxArea?: number;
+        bedrooms?: number;
+        bathrooms?: number;
+    }): Observable<Property[]> {
         let params = new HttpParams();
         if (filters?.search) params = params.set('search', filters.search);
         if (filters?.listingTypeId) params = params.set('listingTypeId', filters.listingTypeId.toString());
         if (filters?.minPrice) params = params.set('minPrice', filters.minPrice.toString());
         if (filters?.maxPrice) params = params.set('maxPrice', filters.maxPrice.toString());
+        if (filters?.cityId) params = params.set('cityId', filters.cityId.toString());
+        if (filters?.districtId) params = params.set('districtId', filters.districtId.toString());
+        if (filters?.minArea) params = params.set('minArea', filters.minArea.toString());
+        if (filters?.maxArea) params = params.set('maxArea', filters.maxArea.toString());
+        if (filters?.bedrooms) params = params.set('bedrooms', filters.bedrooms.toString());
+        if (filters?.bathrooms) params = params.set('bathrooms', filters.bathrooms.toString());
         return this.http.get<Property[]>(this.apiUrl, { params });
     }
 
@@ -61,6 +79,12 @@ export class PropertyService {
         const formData = new FormData();
         formData.append('file', file);
         return this.http.post(`${this.apiUrl}/upload`, formData, { headers: this.getHeaders() });
+    }
+
+    uploadVideo(file: File): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post(`${this.apiUrl}/upload-video`, formData, { headers: this.getHeaders() });
     }
 
     update(id: number, property: any): Observable<Property> {

@@ -1,25 +1,54 @@
 <div class="home-container">
     <div class="header-actions">
-        <h1>Danh sách Bất Động Sản</h1>
+        <h1 class="featured-title">⭐ Tin nổi bật</h1>
         <button (click)="goToCreate()" class="btn-create">➕ Đăng Tin Mới</button>
     </div>
 
     <!-- Search & Filter Bar -->
     <div class="filter-bar">
-        <input type="text" [(ngModel)]="filters.search" placeholder="🔍 Tìm theo tên, địa chỉ, người đăng..."
-            class="filter-input search-input">
+        <!-- Row 1: Search & Basic Filters -->
+        <div class="filter-row">
+            <input type="text" [(ngModel)]="filters.search" placeholder="🔍 Tìm theo tên, địa chỉ, người đăng..."
+                class="filter-input search-input">
 
-        <select [(ngModel)]="filters.listingTypeId" class="filter-input">
-            <option [ngValue]="null">Tất cả loại</option>
-            <option *ngFor="let lt of listingTypes" [ngValue]="lt.id">{{ lt.name }}</option>
-        </select>
+            <select [(ngModel)]="filters.listingTypeId" class="filter-input">
+                <option [ngValue]="null">Tất cả loại</option>
+                <option *ngFor="let lt of listingTypes" [ngValue]="lt.id">{{ lt.name }}</option>
+            </select>
 
-        <input type="number" [(ngModel)]="filters.minPrice" placeholder="Giá từ (VND)" class="filter-input price-input">
-        <input type="number" [(ngModel)]="filters.maxPrice" placeholder="Giá đến (VND)"
-            class="filter-input price-input">
+            <input type="number" [(ngModel)]="filters.minPrice" placeholder="Giá từ (VND)"
+                class="filter-input price-input">
+            <input type="number" [(ngModel)]="filters.maxPrice" placeholder="Giá đến (VND)"
+                class="filter-input price-input">
+        </div>
 
-        <button (click)="loadProperties()" class="btn-filter">🔍 Tìm kiếm</button>
-        <button (click)="resetFilters()" class="btn-reset">↺ Xóa lọc</button>
+        <!-- Row 2: Advanced Filters -->
+        <div class="filter-row">
+            <select [(ngModel)]="filters.cityId" (ngModelChange)="onCityChange()" class="filter-input">
+                <option [ngValue]="null">-- Tỉnh/Thành phố --</option>
+                <option *ngFor="let city of cities" [ngValue]="city.id">{{ city.name }}</option>
+            </select>
+
+            <select [(ngModel)]="filters.districtId" class="filter-input" [disabled]="!filters.cityId">
+                <option [ngValue]="null">-- Quận/Huyện --</option>
+                <option *ngFor="let d of districts" [ngValue]="d.id">{{ d.name }}</option>
+            </select>
+
+            <input type="number" [(ngModel)]="filters.minArea" placeholder="DT từ (m²)" class="filter-input area-input">
+            <input type="number" [(ngModel)]="filters.maxArea" placeholder="DT đến (m²)"
+                class="filter-input area-input">
+
+            <input type="number" [(ngModel)]="filters.bedrooms" placeholder="Phòng ngủ" class="filter-input room-input"
+                min="0">
+            <input type="number" [(ngModel)]="filters.bathrooms" placeholder="Phòng tắm" class="filter-input room-input"
+                min="0">
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="filter-actions">
+            <button (click)="loadProperties()" class="btn-filter">🔍 Tìm kiếm</button>
+            <button (click)="resetFilters()" class="btn-reset">↺ Xóa lọc</button>
+        </div>
     </div>
 
     <div class="property-grid">

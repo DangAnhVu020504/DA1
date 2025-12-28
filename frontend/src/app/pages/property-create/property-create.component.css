@@ -2,6 +2,14 @@
    Property Create Page - Modern Glassmorphism
    ============================================ */
 
+/* Page Background */
+:host {
+    display: block;
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.8) 50%, rgba(15, 52, 96, 0.8) 100%),
+        url('/assets/city-background.jpg') center/cover no-repeat fixed;
+}
+
 .create-container {
     max-width: 700px;
     margin: 0 auto;

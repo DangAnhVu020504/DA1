@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
 import { PropertyImage } from './entities/property-image.entity';
+import { PropertyVideo } from './entities/property-video.entity';
 import { User } from '../users/entities/user.entity';
 import { Listing, ListingStatus } from '../listings/entities/listing.entity';
 
@@ -13,6 +14,8 @@ export class PropertiesService {
         private propertiesRepository: Repository<Property>,
         @InjectRepository(PropertyImage)
         private propertyImagesRepository: Repository<PropertyImage>,
+        @InjectRepository(PropertyVideo)
+        private propertyVideosRepository: Repository<PropertyVideo>,
         @InjectRepository(Listing)
         private listingsRepository: Repository<Listing>,
     ) { }
@@ -33,11 +36,18 @@ export class PropertiesService {
             imageUrl = firstImage?.imageUrl;
         }
 
+        // Get video
+        const video = await this.propertyVideosRepository.findOne({
+            where: { property: { id: property.id } },
+            order: { createdAt: 'DESC' },
+        });
+
         return {
             ...property,
             user: property.owner, // Alias for backwards compatibility
             type: property.listingType?.code || 'sale', // Derived from listingType
             imageUrl: imageUrl || null, // Thumbnail URL
+            videoUrl: video?.videoUrl || null, // Video URL
         };
     }
 
@@ -70,6 +80,15 @@ export class PropertiesService {
             await this.propertyImagesRepository.save(image);
         }
 
+        // Save video if provided
+        if (createPropertyDto.videoUrl) {
+            const video = this.propertyVideosRepository.create({
+                property: saved,
+                videoUrl: createPropertyDto.videoUrl,
+            });
+            await this.propertyVideosRepository.save(video);
+        }
+
         // Auto-create listing for this property (required for comments functionality)
         const listing = this.listingsRepository.create({
             property: { id: saved.id } as any,
@@ -83,13 +102,25 @@ export class PropertiesService {
         return this.findOne(saved.id);
     }
 
-    async findAll(filters?: { search?: string; listingTypeId?: string; minPrice?: string; maxPrice?: string }) {
+    async findAll(filters?: {
+        search?: string;
+        listingTypeId?: string;
+        minPrice?: string;
+        maxPrice?: string;
+        cityId?: string;
+        districtId?: string;
+        minArea?: string;
+        maxArea?: string;
+        bedrooms?: string;
+        bathrooms?: string;
+    }) {
         const query = this.propertiesRepository.createQueryBuilder('property')
             .leftJoinAndSelect('property.owner', 'owner')
             .leftJoinAndSelect('property.propertyType', 'propertyType')
             .leftJoinAndSelect('property.listingType', 'listingType')
             .leftJoinAndSelect('property.district', 'district')
             .leftJoinAndSelect('district.city', 'city')
+            .where('property.status = :status', { status: 'available' })
             .orderBy('property.createdAt', 'DESC');
 
         if (filters?.search) {
@@ -109,6 +140,31 @@ export class PropertiesService {
 
         if (filters?.maxPrice) {
             query.andWhere('property.price <= :maxPrice', { maxPrice: parseFloat(filters.maxPrice) });
+        }
+
+        // Advanced filters
+        if (filters?.cityId) {
+            query.andWhere('city.id = :cityId', { cityId: parseInt(filters.cityId) });
+        }
+
+        if (filters?.districtId) {
+            query.andWhere('district.id = :districtId', { districtId: parseInt(filters.districtId) });
+        }
+
+        if (filters?.minArea) {
+            query.andWhere('property.area >= :minArea', { minArea: parseFloat(filters.minArea) });
+        }
+
+        if (filters?.maxArea) {
+            query.andWhere('property.area <= :maxArea', { maxArea: parseFloat(filters.maxArea) });
+        }
+
+        if (filters?.bedrooms) {
+            query.andWhere('property.bedrooms >= :bedrooms', { bedrooms: parseInt(filters.bedrooms) });
+        }
+
+        if (filters?.bathrooms) {
+            query.andWhere('property.bathrooms >= :bathrooms', { bathrooms: parseInt(filters.bathrooms) });
         }
 
         const properties = await query.getMany();

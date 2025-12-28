@@ -84,6 +84,15 @@ export class AppointmentsService {
         };
     }
 
+    // Find all appointments sent by a specific user (as customer)
+    async findByCustomer(customerId: number) {
+        return this.appointmentsRepository.find({
+            where: { customer: { id: customerId } },
+            relations: ['listing', 'listing.property', 'listing.property.owner'],
+            order: { createdAt: 'DESC' },
+        });
+    }
+
     // Update appointment status
     async updateStatus(id: number, status: string) {
         const appointment = await this.appointmentsRepository.findOne({ where: { id } });

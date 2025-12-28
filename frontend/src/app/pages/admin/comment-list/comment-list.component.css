@@ -1,10 +1,19 @@
+/* Page Background */
+:host {
+    display: block;
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.8) 50%, rgba(15, 52, 96, 0.8) 100%),
+        url('/assets/city-background.jpg') center/cover no-repeat fixed;
+}
+
 .admin-list-container {
     padding: 20px;
 }
 
 h2 {
     margin-bottom: 20px;
-    color: #333;
+    color: white !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .admin-table {

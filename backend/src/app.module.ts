@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PropertiesModule } from './properties/properties.module';
@@ -12,6 +14,8 @@ import { LocationsModule } from './locations/locations.module';
 import { LookupsModule } from './lookups/lookups.module';
 import { ListingsModule } from './listings/listings.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -37,11 +41,14 @@ import { StatisticsModule } from './statistics/statistics.module';
     CommentsModule,
     AppointmentsModule,
     StatisticsModule,
+    FavoritesModule,
+    NewsModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule { }
-
