@@ -22,7 +22,14 @@ export class AdminPropertyFormComponent implements OnInit {
     };
     isEditMode = false;
     propertyId: number | null = null;
-    selectedFile: File | null = null;
+
+    // Multiple images support
+    selectedFiles: File[] = [];
+    imagePreviews: string[] = [];
+
+    // Video support
+    selectedVideoFile: File | null = null;
+
     loading = false;
     error = '';
 
@@ -55,8 +62,32 @@ export class AdminPropertyFormComponent implements OnInit {
         }
     }
 
-    onFileSelected(event: any) {
-        this.selectedFile = event.target.files[0];
+    onFilesSelected(event: any) {
+        const files: FileList = event.target.files;
+        const remainingSlots = 5 - this.selectedFiles.length;
+
+        for (let i = 0; i < Math.min(files.length, remainingSlots); i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                this.selectedFiles.push(file);
+
+                const reader = new FileReader();
+                reader.onload = (e: any) => {
+                    this.imagePreviews.push(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        event.target.value = '';
+    }
+
+    removeImage(index: number) {
+        this.selectedFiles.splice(index, 1);
+        this.imagePreviews.splice(index, 1);
+    }
+
+    onVideoSelected(event: any) {
+        this.selectedVideoFile = event.target.files[0];
     }
 
     async saveProperty() {
@@ -64,9 +95,24 @@ export class AdminPropertyFormComponent implements OnInit {
         this.error = '';
 
         try {
-            if (this.selectedFile) {
-                const uploadRes = await this.propertyService.uploadImage(this.selectedFile).toPromise();
-                this.property.imageUrl = uploadRes.url;
+            // Upload all images
+            const imageUrls: string[] = [];
+            for (const file of this.selectedFiles) {
+                const uploadRes = await this.propertyService.uploadImage(file).toPromise();
+                if (uploadRes?.url) {
+                    imageUrls.push(uploadRes.url);
+                }
+            }
+
+            if (imageUrls.length > 0) {
+                this.property.imageUrl = imageUrls[0];
+                this.property.imageUrls = imageUrls;
+            }
+
+            // Upload video if selected
+            if (this.selectedVideoFile) {
+                const videoRes = await this.propertyService.uploadVideo(this.selectedVideoFile).toPromise();
+                this.property.videoUrl = videoRes?.url;
             }
 
             if (this.isEditMode && this.propertyId) {
@@ -87,7 +133,7 @@ export class AdminPropertyFormComponent implements OnInit {
                 });
             }
         } catch (err) {
-            this.error = 'Lỗi upload ảnh';
+            this.error = 'Lỗi upload file';
             this.loading = false;
         }
     }

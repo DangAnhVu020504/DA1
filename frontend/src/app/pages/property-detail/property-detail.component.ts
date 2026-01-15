@@ -21,6 +21,10 @@ export class PropertyDetailComponent implements OnInit {
     error = '';
     propertyId: number | null = null;
 
+    // Image gallery
+    currentImageIndex = 0;
+    currentImageUrl: string | null = null;
+
     // Comment form states
     commentError = '';
     commentSuccess = '';
@@ -48,8 +52,15 @@ export class PropertyDetailComponent implements OnInit {
     loadProperty() {
         if (this.propertyId) {
             this.propertyService.findOne(this.propertyId).subscribe({
-                next: (data) => {
+                next: (data: any) => {
                     this.property = data;
+                    // Set initial image
+                    if (data.imageUrls && data.imageUrls.length > 0) {
+                        this.currentImageUrl = data.imageUrls[0];
+                        this.currentImageIndex = 0;
+                    } else {
+                        this.currentImageUrl = data.imageUrl;
+                    }
                     this.loading = false;
                 },
                 error: (err) => {
@@ -58,6 +69,26 @@ export class PropertyDetailComponent implements OnInit {
                     console.error(err);
                 }
             });
+        }
+    }
+
+    // Gallery navigation
+    selectImage(index: number) {
+        if (this.property?.imageUrls) {
+            this.currentImageIndex = index;
+            this.currentImageUrl = this.property.imageUrls[index];
+        }
+    }
+
+    prevImage() {
+        if (this.currentImageIndex > 0) {
+            this.selectImage(this.currentImageIndex - 1);
+        }
+    }
+
+    nextImage() {
+        if (this.property?.imageUrls && this.currentImageIndex < this.property.imageUrls.length - 1) {
+            this.selectImage(this.currentImageIndex + 1);
         }
     }
 

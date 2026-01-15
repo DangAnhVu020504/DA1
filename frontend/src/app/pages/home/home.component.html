@@ -4,127 +4,167 @@
         <button (click)="goToCreate()" class="btn-create">➕ Đăng Tin Mới</button>
     </div>
 
-    <!-- Search & Filter Bar -->
-    <div class="filter-bar">
-        <!-- Row 1: Search & Basic Filters -->
-        <div class="filter-row">
-            <input type="text" [(ngModel)]="filters.search" placeholder="🔍 Tìm theo tên, địa chỉ, người đăng..."
-                class="filter-input search-input">
+    <!-- Main Content Layout: Grid + Sidebar -->
+    <div class="main-layout">
+        <!-- Left: Property Grid -->
+        <div class="content-area">
+            <!-- Sort & Results Info -->
+            <div class="sort-bar">
+                <span class="result-count">📊 Tìm thấy {{ totalItems }} kết quả</span>
 
-            <select [(ngModel)]="filters.listingTypeId" class="filter-input">
-                <option [ngValue]="null">Tất cả loại</option>
-                <option *ngFor="let lt of listingTypes" [ngValue]="lt.id">{{ lt.name }}</option>
-            </select>
-
-            <input type="number" [(ngModel)]="filters.minPrice" placeholder="Giá từ (VND)"
-                class="filter-input price-input">
-            <input type="number" [(ngModel)]="filters.maxPrice" placeholder="Giá đến (VND)"
-                class="filter-input price-input">
-        </div>
-
-        <!-- Row 2: Advanced Filters -->
-        <div class="filter-row">
-            <select [(ngModel)]="filters.cityId" (ngModelChange)="onCityChange()" class="filter-input">
-                <option [ngValue]="null">-- Tỉnh/Thành phố --</option>
-                <option *ngFor="let city of cities" [ngValue]="city.id">{{ city.name }}</option>
-            </select>
-
-            <select [(ngModel)]="filters.districtId" class="filter-input" [disabled]="!filters.cityId">
-                <option [ngValue]="null">-- Quận/Huyện --</option>
-                <option *ngFor="let d of districts" [ngValue]="d.id">{{ d.name }}</option>
-            </select>
-
-            <input type="number" [(ngModel)]="filters.minArea" placeholder="DT từ (m²)" class="filter-input area-input">
-            <input type="number" [(ngModel)]="filters.maxArea" placeholder="DT đến (m²)"
-                class="filter-input area-input">
-
-            <input type="number" [(ngModel)]="filters.bedrooms" placeholder="Phòng ngủ" class="filter-input room-input"
-                min="0">
-            <input type="number" [(ngModel)]="filters.bathrooms" placeholder="Phòng tắm" class="filter-input room-input"
-                min="0">
-        </div>
-
-        <!-- Filter Actions -->
-        <div class="filter-actions">
-            <button (click)="loadProperties()" class="btn-filter">🔍 Tìm kiếm</button>
-            <button (click)="resetFilters()" class="btn-reset">↺ Xóa lọc</button>
-        </div>
-    </div>
-
-    <!-- Sort & Results Info -->
-    <div class="sort-bar">
-        <span class="result-count">📊 Tìm thấy {{ totalItems }} kết quả</span>
-
-        <div class="sort-controls">
-            <label>Sắp xếp:</label>
-            <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()" class="sort-select">
-                <option value="createdAt">Mới nhất</option>
-                <option value="price">Giá</option>
-                <option value="area">Diện tích</option>
-                <option value="views">Lượt xem</option>
-            </select>
-            <select [(ngModel)]="sortOrder" (ngModelChange)="onSortChange()" class="sort-select">
-                <option value="DESC">Giảm dần</option>
-                <option value="ASC">Tăng dần</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="property-grid">
-        <div *ngFor="let prop of properties" class="property-card">
-            <div class="card-image-container" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
-                <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/house-placeholder.jpg'"
-                    alt="Property Image" class="property-img">
-                <button class="heart-btn" (click)="toggleLike(prop, $event)" [class.liked]="prop.liked">
-                    ❤️
-                </button>
-                <span class="views-badge" *ngIf="prop.views">👁️ {{ prop.views }}</span>
-            </div>
-            <div class="property-info" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
-                <span class="type-badge" [ngClass]="prop.listingType?.code === 'rent' ? 'rent' : 'sale'">
-                    {{ prop.listingType?.name || 'Bất động sản' }}
-                </span>
-                <h3>{{ prop.title }}</h3>
-                <p class="price">{{ prop.price | number }} VND</p>
-                <p class="address">📍 {{ prop.address }}</p>
-                <p class="area" *ngIf="prop.area">📐 {{ prop.area }} m²</p>
-                <p class="location" *ngIf="prop.district">
-                    🏙️ {{ prop.district.name }}<span *ngIf="prop.district.city">, {{ prop.district.city.name }}</span>
-                </p>
-            </div>
-            <div class="poster-info" *ngIf="prop.owner">
-                <img [src]="prop.owner.avatar ? 'http://localhost:3000' + prop.owner.avatar : 'assets/default-avatar.png'"
-                    alt="Poster Avatar" class="poster-avatar">
-                <div class="poster-details">
-                    <span class="poster-name">{{ prop.owner.fullName }}</span>
-                    <span class="poster-phone" *ngIf="prop.owner.phone">📞 {{ prop.owner.phone }}</span>
+                <div class="sort-controls">
+                    <label>Sắp xếp:</label>
+                    <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()" class="sort-select">
+                        <option value="createdAt">Mới nhất</option>
+                        <option value="price">Giá</option>
+                        <option value="area">Diện tích</option>
+                        <option value="views">Lượt xem</option>
+                    </select>
+                    <select [(ngModel)]="sortOrder" (ngModelChange)="onSortChange()" class="sort-select">
+                        <option value="DESC">Giảm dần</option>
+                        <option value="ASC">Tăng dần</option>
+                    </select>
                 </div>
             </div>
-            <div class="card-actions">
-                <button [routerLink]="['/booking', prop.id]" class="btn-booking" (click)="$event.stopPropagation()">
-                    📅 Đặt lịch / Liên hệ
+
+            <div class="property-grid">
+                <div *ngFor="let prop of properties" class="property-card">
+                    <div class="card-image-container" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
+                        <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/house-placeholder.jpg'"
+                            alt="Property Image" class="property-img">
+                        <button class="heart-btn" (click)="toggleLike(prop, $event)" [class.liked]="prop.liked">
+                            ❤️
+                        </button>
+                        <span class="views-badge" *ngIf="prop.views">👁️ {{ prop.views }}</span>
+                    </div>
+                    <div class="property-info" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
+                        <span class="type-badge" [ngClass]="prop.listingType?.code === 'rent' ? 'rent' : 'sale'">
+                            {{ prop.listingType?.name || 'Bất động sản' }}
+                        </span>
+                        <h3>{{ prop.title }}</h3>
+                        <p class="price">{{ prop.price | number }} VND</p>
+                        <p class="address">📍 {{ prop.address }}</p>
+                        <p class="area" *ngIf="prop.area">📐 {{ prop.area }} m²</p>
+                        <p class="location" *ngIf="prop.district">
+                            🏙️ {{ prop.district.name }}<span *ngIf="prop.district.city">, {{ prop.district.city.name
+                                }}</span>
+                        </p>
+                    </div>
+                    <div class="poster-info" *ngIf="prop.owner">
+                        <img [src]="prop.owner.avatar ? 'http://localhost:3000' + prop.owner.avatar : 'assets/default-avatar.png'"
+                            alt="Poster Avatar" class="poster-avatar">
+                        <div class="poster-details">
+                            <span class="poster-name">{{ prop.owner.fullName }}</span>
+                            <span class="poster-phone" *ngIf="prop.owner.phone">📞 {{ prop.owner.phone }}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button [routerLink]="['/booking', prop.id]" class="btn-booking"
+                            (click)="$event.stopPropagation()">
+                            📅 Đặt lịch / Liên hệ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="properties.length === 0" class="no-properties">
+                <p>Chưa có tin đăng nào.</p>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" *ngIf="totalPages > 1">
+                <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
+                <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+
+                <button *ngFor="let page of getPageNumbers()" class="page-btn" [class.active]="page === currentPage"
+                    (click)="goToPage(page)">
+                    {{ page }}
                 </button>
+
+                <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
+                <button class="page-btn" (click)="goToPage(totalPages)"
+                    [disabled]="currentPage === totalPages">»</button>
+
+                <span class="page-info">Trang {{ currentPage }} / {{ totalPages }}</span>
             </div>
         </div>
-    </div>
 
-    <div *ngIf="properties.length === 0" class="no-properties">
-        <p>Chưa có tin đăng nào.</p>
-    </div>
+        <!-- Right: Sticky Filter Sidebar -->
+        <div class="filter-sidebar">
+            <div class="filter-sidebar-content">
+                <h3 class="filter-title">🔍 Tìm kiếm & Lọc</h3>
 
-    <!-- Pagination -->
-    <div class="pagination" *ngIf="totalPages > 1">
-        <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">«</button>
-        <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">‹</button>
+                <!-- Search -->
+                <div class="sidebar-group">
+                    <label>Từ khóa</label>
+                    <input type="text" [(ngModel)]="filters.search" placeholder="Tìm theo tên, địa chỉ..."
+                        class="sidebar-input" (keyup.enter)="loadProperties()">
+                </div>
 
-        <button *ngFor="let page of getPageNumbers()" class="page-btn" [class.active]="page === currentPage"
-            (click)="goToPage(page)">
-            {{ page }}
-        </button>
+                <!-- Listing Type -->
+                <div class="sidebar-group">
+                    <label>📋 Loại giao dịch</label>
+                    <select [(ngModel)]="filters.listingTypeId" class="sidebar-select"
+                        (ngModelChange)="loadProperties()">
+                        <option [ngValue]="null">Tất cả loại</option>
+                        <option *ngFor="let lt of listingTypes" [ngValue]="lt.id">{{ lt.name }}</option>
+                    </select>
+                </div>
 
-        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">›</button>
-        <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">»</button>
+                <!-- Location -->
+                <div class="sidebar-group">
+                    <label>📍 Tỉnh/Thành phố</label>
+                    <select [(ngModel)]="filters.cityId" (ngModelChange)="onCityChange()" class="sidebar-select">
+                        <option [ngValue]="null">Tất cả</option>
+                        <option *ngFor="let city of cities" [ngValue]="city.id">{{ city.name }}</option>
+                    </select>
+                </div>
 
-        <span class="page-info">Trang {{ currentPage }} / {{ totalPages }}</span>
+                <div class="sidebar-group" *ngIf="filters.cityId">
+                    <label>🏠 Quận/Huyện</label>
+                    <select [(ngModel)]="filters.districtId" class="sidebar-select">
+                        <option [ngValue]="null">Tất cả</option>
+                        <option *ngFor="let d of districts" [ngValue]="d.id">{{ d.name }}</option>
+                    </select>
+                </div>
+
+                <!-- Price Range -->
+                <div class="sidebar-group">
+                    <label>💰 Khoảng giá (VND)</label>
+                    <div class="range-inputs">
+                        <input type="number" [(ngModel)]="filters.minPrice" placeholder="Từ" class="range-input">
+                        <span>-</span>
+                        <input type="number" [(ngModel)]="filters.maxPrice" placeholder="Đến" class="range-input">
+                    </div>
+                </div>
+
+                <!-- Area Range -->
+                <div class="sidebar-group">
+                    <label>📐 Diện tích (m²)</label>
+                    <div class="range-inputs">
+                        <input type="number" [(ngModel)]="filters.minArea" placeholder="Từ" class="range-input">
+                        <span>-</span>
+                        <input type="number" [(ngModel)]="filters.maxArea" placeholder="Đến" class="range-input">
+                    </div>
+                </div>
+
+                <!-- Rooms -->
+                <div class="sidebar-group">
+                    <label>🛏️ Phòng ngủ / Phòng tắm</label>
+                    <div class="range-inputs">
+                        <input type="number" [(ngModel)]="filters.bedrooms" placeholder="PN" class="range-input"
+                            min="0">
+                        <input type="number" [(ngModel)]="filters.bathrooms" placeholder="PT" class="range-input"
+                            min="0">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="sidebar-actions">
+                    <button (click)="loadProperties()" class="btn-apply">🔍 Áp dụng</button>
+                    <button (click)="resetFilters()" class="btn-reset-sidebar">↺ Xóa lọc</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

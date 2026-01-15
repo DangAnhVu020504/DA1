@@ -92,8 +92,16 @@
 
         <div class="form-row">
             <div class="form-group">
-                <label>Hình ảnh mô tả</label>
-                <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file">
+                <label>📸 Hình ảnh mô tả (chọn tối đa 5 ảnh)</label>
+                <input type="file" (change)="onFilesSelected($event)" accept="image/*" multiple
+                    class="form-control-file">
+                <div class="image-preview-grid" *ngIf="imagePreviews.length > 0">
+                    <div class="image-preview-item" *ngFor="let preview of imagePreviews; let i = index">
+                        <img [src]="preview" alt="Preview">
+                        <button type="button" class="remove-btn" (click)="removeImage(i)">✕</button>
+                    </div>
+                </div>
+                <small class="text-muted">Đã chọn {{ selectedFiles.length }}/5 ảnh</small>
             </div>
         </div>
 

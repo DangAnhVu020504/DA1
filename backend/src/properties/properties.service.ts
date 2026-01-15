@@ -22,19 +22,18 @@ export class PropertiesService {
 
     // Helper function to transform property and add virtual fields
     private async transformProperty(property: Property): Promise<any> {
-        // Get thumbnail image
-        const thumbnail = await this.propertyImagesRepository.findOne({
-            where: { property: { id: property.id }, isThumbnail: true },
+        // Get all images for this property
+        const allImages = await this.propertyImagesRepository.find({
+            where: { property: { id: property.id } },
+            order: { isThumbnail: 'DESC', id: 'ASC' },
         });
 
-        // If no thumbnail, get first image
-        let imageUrl = thumbnail?.imageUrl;
-        if (!imageUrl) {
-            const firstImage = await this.propertyImagesRepository.findOne({
-                where: { property: { id: property.id } },
-            });
-            imageUrl = firstImage?.imageUrl;
-        }
+        // Get thumbnail (first with isThumbnail=true) or first image
+        const thumbnail = allImages.find(img => img.isThumbnail) || allImages[0];
+        const imageUrl = thumbnail?.imageUrl || null;
+
+        // Get all image URLs
+        const imageUrls = allImages.map(img => img.imageUrl);
 
         // Get video
         const video = await this.propertyVideosRepository.findOne({
@@ -46,7 +45,8 @@ export class PropertiesService {
             ...property,
             user: property.owner, // Alias for backwards compatibility
             type: property.listingType?.code || 'sale', // Derived from listingType
-            imageUrl: imageUrl || null, // Thumbnail URL
+            imageUrl: imageUrl, // Thumbnail URL (for backward compatibility)
+            imageUrls: imageUrls, // All image URLs for gallery
             videoUrl: video?.videoUrl || null, // Video URL
         };
     }
@@ -71,11 +71,17 @@ export class PropertiesService {
         const saved = await this.propertiesRepository.save(property);
 
         // Save images if provided
-        if (createPropertyDto.imageUrl) {
+        // Support both imageUrls array (multiple images) and single imageUrl
+        const imageUrls: string[] = createPropertyDto.imageUrls || [];
+        if (createPropertyDto.imageUrl && !imageUrls.includes(createPropertyDto.imageUrl)) {
+            imageUrls.unshift(createPropertyDto.imageUrl); // Add single imageUrl to front if not already in array
+        }
+
+        for (let i = 0; i < imageUrls.length; i++) {
             const image = this.propertyImagesRepository.create({
                 property: saved,
-                imageUrl: createPropertyDto.imageUrl,
-                isThumbnail: true,
+                imageUrl: imageUrls[i],
+                isThumbnail: i === 0, // First image is thumbnail
             });
             await this.propertyImagesRepository.save(image);
         }
@@ -253,24 +259,30 @@ export class PropertiesService {
             delete updateData.listingTypeId;
         }
 
-        // Handle image update
-        if (updatePropertyDto.imageUrl) {
+        // Handle image update - support both imageUrls array and single imageUrl
+        const newImageUrls: string[] = updatePropertyDto.imageUrls || [];
+        if (updatePropertyDto.imageUrl && !newImageUrls.includes(updatePropertyDto.imageUrl)) {
+            newImageUrls.unshift(updatePropertyDto.imageUrl);
+        }
+
+        if (newImageUrls.length > 0) {
             const property = await this.propertiesRepository.findOne({ where: { id } });
             if (property) {
-                // Remove old thumbnail
-                await this.propertyImagesRepository.delete({
-                    property: { id },
-                    isThumbnail: true
-                });
-                // Add new thumbnail
-                const image = this.propertyImagesRepository.create({
-                    property: { id } as any,
-                    imageUrl: updatePropertyDto.imageUrl,
-                    isThumbnail: true,
-                });
-                await this.propertyImagesRepository.save(image);
+                // Remove all old images for this property
+                await this.propertyImagesRepository.delete({ property: { id } });
+
+                // Add new images
+                for (let i = 0; i < newImageUrls.length; i++) {
+                    const image = this.propertyImagesRepository.create({
+                        property: { id } as any,
+                        imageUrl: newImageUrls[i],
+                        isThumbnail: i === 0,
+                    });
+                    await this.propertyImagesRepository.save(image);
+                }
             }
             delete updateData.imageUrl;
+            delete updateData.imageUrls;
         }
 
         // Handle amenities update
@@ -291,10 +303,24 @@ export class PropertiesService {
     }
 
     async remove(id: number) {
-        const result = await this.propertiesRepository.delete(id);
-        if (result.affected === 0) {
+        // First check if property exists
+        const property = await this.propertiesRepository.findOne({ where: { id } });
+        if (!property) {
             throw new NotFoundException(`Property with ID ${id} not found`);
         }
+
+        // Delete related records first to avoid foreign key constraints
+        // Delete property images
+        await this.propertyImagesRepository.delete({ property: { id } });
+
+        // Delete property videos
+        await this.propertyVideosRepository.delete({ property: { id } });
+
+        // Delete related listings (which also clears comments and appointments)
+        await this.listingsRepository.delete({ property: { id } });
+
+        // Finally delete the property
+        await this.propertiesRepository.delete(id);
     }
 }
 

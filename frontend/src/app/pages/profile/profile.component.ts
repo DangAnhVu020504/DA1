@@ -28,6 +28,9 @@ export class ProfileComponent implements OnInit {
     favoritesCount = 0;
     appointmentsCount = 0;
 
+    // Avatar Upload
+    isUploadingAvatar = false;
+
     // Password Change
     showPasswordForm = false;
     isChangingPassword = false;
@@ -193,6 +196,49 @@ export class ProfileComponent implements OnInit {
                 }
             }
         });
+    }
+
+    // Avatar Upload Method
+    onAvatarSelected(event: any) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Vui lòng chọn file ảnh!');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Kích thước ảnh tối đa là 5MB!');
+            return;
+        }
+
+        this.isUploadingAvatar = true;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const token = localStorage.getItem('token');
+        const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+        this.http.post<{ avatar: string }>('http://localhost:3000/users/upload/avatar', formData, { headers }).subscribe({
+            next: (response) => {
+                this.user.avatar = response.avatar;
+                this.authService.updateCurrentUser(this.user);
+                this.isUploadingAvatar = false;
+                alert('✅ Cập nhật ảnh đại diện thành công!');
+            },
+            error: (err) => {
+                console.error('Avatar upload failed:', err);
+                this.isUploadingAvatar = false;
+                alert('❌ Lỗi khi tải ảnh lên!');
+            }
+        });
+
+        // Reset input to allow selecting same file again
+        event.target.value = '';
     }
 }
 

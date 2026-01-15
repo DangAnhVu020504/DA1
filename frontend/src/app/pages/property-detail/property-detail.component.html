@@ -7,8 +7,22 @@
 
         <div class="detail-content">
             <div class="image-section">
-                <img [src]="property.imageUrl ? 'http://localhost:3000' + property.imageUrl : 'assets/house-placeholder.jpg'"
+                <!-- Main Image Display -->
+                <img [src]="currentImageUrl ? 'http://localhost:3000' + currentImageUrl : 'assets/house-placeholder.jpg'"
                     alt="{{ property.title }}" class="main-image">
+
+                <!-- Image Gallery Thumbnails -->
+                <div class="image-gallery" *ngIf="property.imageUrls && property.imageUrls.length > 1">
+                    <button class="gallery-nav prev" (click)="prevImage()" *ngIf="currentImageIndex > 0">❮</button>
+                    <div class="gallery-thumbnails">
+                        <img *ngFor="let img of property.imageUrls; let i = index" [src]="'http://localhost:3000' + img"
+                            [class.active]="i === currentImageIndex" (click)="selectImage(i)"
+                            alt="Thumbnail {{ i + 1 }}">
+                    </div>
+                    <button class="gallery-nav next" (click)="nextImage()"
+                        *ngIf="currentImageIndex < property.imageUrls.length - 1">❯</button>
+                    <div class="image-counter">{{ currentImageIndex + 1 }} / {{ property.imageUrls.length }}</div>
+                </div>
 
                 <!-- Video Section -->
                 <div class="video-section" *ngIf="property.videoUrl">

@@ -30,6 +30,9 @@ export class HomeComponent implements OnInit {
     sortBy = 'createdAt';
     sortOrder = 'DESC';
 
+    // Advanced filters toggle
+    showAdvancedFilters = false;
+
     filters = {
         search: '',
         listingTypeId: null as number | null,

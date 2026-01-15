@@ -17,6 +17,7 @@ export interface Property {
     views?: number;
     createdAt?: Date;
     imageUrl?: string; // Thumbnail image URL
+    imageUrls?: string[]; // All image URLs for gallery
     videoUrl?: string; // Video URL
     // Relations
     owner?: any;

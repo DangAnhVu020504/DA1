@@ -32,7 +32,8 @@ export class PropertyCreateComponent implements OnInit {
     listingTypes: ListingType[] = [];
     selectedCityId: number | null = null;
 
-    selectedFile: File | null = null;
+    selectedFiles: File[] = [];
+    imagePreviews: string[] = [];
     selectedVideoFile: File | null = null;
     loading = false;
     error = '';
@@ -64,8 +65,31 @@ export class PropertyCreateComponent implements OnInit {
         }
     }
 
-    onFileSelected(event: any) {
-        this.selectedFile = event.target.files[0];
+    onFilesSelected(event: any) {
+        const files: FileList = event.target.files;
+        const remainingSlots = 5 - this.selectedFiles.length;
+
+        for (let i = 0; i < Math.min(files.length, remainingSlots); i++) {
+            const file = files[i];
+            if (file.type.startsWith('image/')) {
+                this.selectedFiles.push(file);
+
+                // Generate preview
+                const reader = new FileReader();
+                reader.onload = (e: any) => {
+                    this.imagePreviews.push(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Reset input to allow re-selecting
+        event.target.value = '';
+    }
+
+    removeImage(index: number) {
+        this.selectedFiles.splice(index, 1);
+        this.imagePreviews.splice(index, 1);
     }
 
     onVideoSelected(event: any) {
@@ -77,16 +101,25 @@ export class PropertyCreateComponent implements OnInit {
         this.error = '';
 
         try {
-            // Upload image first if selected
-            if (this.selectedFile) {
-                const uploadRes = await this.propertyService.uploadImage(this.selectedFile).toPromise();
-                this.property.imageUrl = uploadRes.url;
+            // Upload all images
+            const imageUrls: string[] = [];
+            for (const file of this.selectedFiles) {
+                const uploadRes = await this.propertyService.uploadImage(file).toPromise();
+                if (uploadRes?.url) {
+                    imageUrls.push(uploadRes.url);
+                }
+            }
+
+            // Set first image as main thumbnail
+            if (imageUrls.length > 0) {
+                this.property.imageUrl = imageUrls[0];
+                this.property.imageUrls = imageUrls; // All images for backend
             }
 
             // Upload video if selected
             if (this.selectedVideoFile) {
                 const videoRes = await this.propertyService.uploadVideo(this.selectedVideoFile).toPromise();
-                this.property.videoUrl = videoRes.url;
+                this.property.videoUrl = videoRes?.url;
             }
 
             // Create property

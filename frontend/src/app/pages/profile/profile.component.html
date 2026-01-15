@@ -11,8 +11,11 @@
                     <div class="avatar-wrapper">
                         <img [src]="user.avatar ? 'http://localhost:3000' + user.avatar : 'assets/default-avatar.png'"
                             alt="Avatar" class="avatar-img">
-                        <button class="avatar-edit-btn" title="Thay đổi ảnh">
-                            <span>📷</span>
+                        <input type="file" #avatarInput accept="image/*" (change)="onAvatarSelected($event)"
+                            style="display: none;">
+                        <button class="avatar-edit-btn" title="Thay đổi ảnh" (click)="avatarInput.click()"
+                            [disabled]="isUploadingAvatar">
+                            <span>{{ isUploadingAvatar ? '⏳' : '📷' }}</span>
                         </button>
                         <div class="online-indicator"></div>
                     </div>

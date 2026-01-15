@@ -33,9 +33,35 @@
         </div>
 
         <div class="form-group">
-            <label>Hình ảnh</label>
-            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="form-control-file">
-            <img *ngIf="property.imageUrl" [src]="'http://localhost:3000' + property.imageUrl" class="preview-img">
+            <label>📸 Hình ảnh (chọn tối đa 5 ảnh)</label>
+            <input type="file" (change)="onFilesSelected($event)" accept="image/*" multiple class="form-control-file">
+
+            <!-- Existing Image Preview (Edit Mode) -->
+            <img *ngIf="property.imageUrl && imagePreviews.length === 0"
+                [src]="'http://localhost:3000' + property.imageUrl" class="preview-img">
+
+            <!-- New Images Preview Grid -->
+            <div class="image-preview-grid" *ngIf="imagePreviews.length > 0">
+                <div class="image-preview-item" *ngFor="let preview of imagePreviews; let i = index">
+                    <img [src]="preview" alt="Preview">
+                    <button type="button" class="remove-btn" (click)="removeImage(i)">✕</button>
+                </div>
+            </div>
+            <small class="text-muted">Đã chọn {{ selectedFiles.length }}/5 ảnh</small>
+        </div>
+
+        <div class="form-group">
+            <label>🎬 Video giới thiệu (MP4, WebM - tối đa 100MB)</label>
+            <input type="file" (change)="onVideoSelected($event)" accept="video/mp4,video/webm,video/quicktime"
+                class="form-control-file">
+
+            <!-- Existing Video Preview (Edit Mode) -->
+            <div *ngIf="property.videoUrl" class="video-preview">
+                <video [src]="'http://localhost:3000' + property.videoUrl" controls width="200"></video>
+            </div>
+
+            <!-- New Video Selected -->
+            <small *ngIf="selectedVideoFile" class="text-muted">✅ Đã chọn video: {{ selectedVideoFile.name }}</small>
         </div>
 
         <div class="actions">
