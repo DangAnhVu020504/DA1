@@ -165,8 +165,7 @@
     <div *ngIf="!loading && !showForm && filteredProperties.length > 0" class="property-grid">
         <div *ngFor="let prop of filteredProperties" class="property-card">
             <div class="property-image clickable" (click)="viewPropertyDetail(prop.id!)">
-                <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/default-property.jpg'"
-                    alt="property">
+                <img [src]="getImageUrl(prop.imageUrl)" alt="property">
                 <span class="status-badge" [class]="prop.status">
                     {{ getStatusLabel(prop.status!) }}
                 </span>

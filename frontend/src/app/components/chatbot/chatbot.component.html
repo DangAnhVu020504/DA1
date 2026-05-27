@@ -1,0 +1,67 @@
+<div class="chatbot-wrapper">
+    <div class="chat-window" [class.open]="isOpen">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-avatar-wrapper">
+                    <span class="chat-avatar">🤖</span>
+                    <span class="status-dot"></span>
+                </div>
+                <div class="chat-header-text">
+                    <span class="chat-title">Trợ lý AI BĐS</span>
+                    <span class="chat-status">{{ isTyping ? 'Đang trả lời...' : 'Trực tuyến' }}</span>
+                </div>
+            </div>
+            <button class="chat-close-btn" (click)="toggleChat()">✕</button>
+        </div>
+
+        <div class="chat-body" #chatBody>
+            <div class="welcome-message" *ngIf="messages.length === 0">
+                <div class="welcome-icon">🏠</div>
+                <h3>Xin chào!</h3>
+                <p>Tôi là trợ lý AI của BatDongSanVIP. Tôi có thể giúp bạn:</p>
+                <div class="suggestion-chips">
+                    <button class="chip" (click)="sendSuggestion('Tôi muốn tìm mua nhà ở Hà Nội')">🔍 Tìm mua nhà</button>
+                    <button class="chip" (click)="sendSuggestion('Hướng dẫn đăng tin bất động sản')">📝 Đăng tin BĐS</button>
+                    <button class="chip" (click)="sendSuggestion('Thủ tục mua bán nhà đất cần gì?')">📋 Thủ tục pháp lý</button>
+                    <button class="chip" (click)="sendSuggestion('Cách đặt lịch hẹn xem nhà')">📅 Đặt lịch hẹn</button>
+                </div>
+            </div>
+
+            <div *ngFor="let msg of messages" class="message-row" [class.user]="msg.sender === 'user'" [class.bot]="msg.sender === 'bot'">
+                <div class="message-avatar" *ngIf="msg.sender === 'bot'">🤖</div>
+                <div class="message-bubble" [class.user-bubble]="msg.sender === 'user'" [class.bot-bubble]="msg.sender === 'bot'">
+                    <span class="message-text" [innerHTML]="formatMessage(msg.text)"></span>
+                    <span class="message-time">{{ msg.time }}</span>
+                </div>
+                <div class="message-avatar user-avatar-icon" *ngIf="msg.sender === 'user'">👤</div>
+            </div>
+
+            <div class="message-row bot" *ngIf="isTyping">
+                <div class="message-avatar">🤖</div>
+                <div class="message-bubble bot-bubble typing-bubble">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-footer">
+            <div class="input-wrapper">
+                <input type="text" [(ngModel)]="userInput" (keydown.enter)="sendMessage()" placeholder="Nhập câu hỏi của bạn..." [disabled]="isTyping" />
+                <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isTyping">
+                    <span class="send-icon">➤</span>
+                </button>
+            </div>
+            <span class="powered-by">Powered by Gemini AI ✨</span>
+        </div>
+    </div>
+
+    <button class="chat-toggle-btn" [class.active]="isOpen" (click)="toggleChat()">
+        <span class="toggle-icon" *ngIf="!isOpen">💬</span>
+        <span class="toggle-icon close-icon" *ngIf="isOpen">✕</span>
+        <span class="pulse-ring" *ngIf="!isOpen"></span>
+    </button>
+</div>

@@ -62,7 +62,7 @@ export class PropertiesService {
             bathrooms: createPropertyDto.bathrooms || 0,
             direction: createPropertyDto.direction,
             legalStatus: createPropertyDto.legalStatus,
-            status: createPropertyDto.status || 'draft',
+            status: createPropertyDto.status || 'available',
             owner: user,
             propertyType: { id: createPropertyDto.typeId } as any,
             district: { id: createPropertyDto.districtId } as any,

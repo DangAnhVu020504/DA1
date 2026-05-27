@@ -331,30 +331,42 @@ INSERT INTO properties (owner_id, type_id, district_id, listing_type_id, title, 
 -- ================= DỮ LIỆU MẪU - PROPERTY IMAGES (24 ảnh) =================
 
 INSERT INTO property_images (property_id, image_url, is_thumbnail) VALUES
-(1, '/uploads/properties/property1_1.jpg', 1),
-(1, '/uploads/properties/property1_2.jpg', 0),
-(2, '/uploads/properties/property2_1.jpg', 1),
-(2, '/uploads/properties/property2_2.jpg', 0),
-(3, '/uploads/properties/property3_1.jpg', 1),
-(3, '/uploads/properties/property3_2.jpg', 0),
-(4, '/uploads/properties/property4_1.jpg', 1),
-(4, '/uploads/properties/property4_2.jpg', 0),
-(5, '/uploads/properties/property5_1.jpg', 1),
-(5, '/uploads/properties/property5_2.jpg', 0),
-(6, '/uploads/properties/property6_1.jpg', 1),
-(6, '/uploads/properties/property6_2.jpg', 0),
-(7, '/uploads/properties/property7_1.jpg', 1),
-(7, '/uploads/properties/property7_2.jpg', 0),
-(8, '/uploads/properties/property8_1.jpg', 1),
-(8, '/uploads/properties/property8_2.jpg', 0),
-(9, '/uploads/properties/property9_1.jpg', 1),
-(9, '/uploads/properties/property9_2.jpg', 0),
-(10, '/uploads/properties/property10_1.jpg', 1),
-(10, '/uploads/properties/property10_2.jpg', 0),
-(11, '/uploads/properties/property11_1.jpg', 1),
-(11, '/uploads/properties/property11_2.jpg', 0),
-(12, '/uploads/properties/property12_1.jpg', 1),
-(12, '/uploads/properties/property12_2.jpg', 0);
+-- Property 1: Căn hộ Vinhomes Golden River
+(1, 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop', 1),
+(1, 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop', 0),
+-- Property 2: Nhà phố Thảo Điền
+(2, 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop', 1),
+(2, 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop', 0),
+-- Property 3: Đất nền Phú Mỹ Hưng
+(3, 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop', 1),
+(3, 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?w=800&h=600&fit=crop', 0),
+-- Property 4: Biệt thự Villa Park
+(4, 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=600&fit=crop', 1),
+(4, 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', 0),
+-- Property 5: Căn hộ cho thuê City Garden
+(5, 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop', 1),
+(5, 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop', 0),
+-- Property 6: Nhà mặt tiền Quận 3
+(6, 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&h=600&fit=crop', 1),
+(6, 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop', 0),
+-- Property 7: Căn hộ Lotte Hà Nội
+(7, 'https://images.unsplash.com/photo-1502672023488-70e25813eb80?w=800&h=600&fit=crop', 1),
+(7, 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop', 0),
+-- Property 8: Nhà riêng Cầu Giấy
+(8, 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&h=600&fit=crop', 1),
+(8, 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&h=600&fit=crop', 0),
+-- Property 9: Shophouse Đà Nẵng
+(9, 'https://images.unsplash.com/photo-1555636222-cae831e670b3?w=800&h=600&fit=crop', 1),
+(9, 'https://images.unsplash.com/photo-1519643381401-22c77e60520e?w=800&h=600&fit=crop', 0),
+-- Property 10: Căn hộ Sunrise City
+(10, 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop', 1),
+(10, 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&h=600&fit=crop', 0),
+-- Property 11: Đất thổ cư Nha Trang
+(11, 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop', 1),
+(11, 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=600&fit=crop', 0),
+-- Property 12: Văn phòng Bitexco
+(12, 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop', 1),
+(12, 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&h=600&fit=crop', 0);
 
 -- ================= DỮ LIỆU MẪU - PROPERTY AMENITIES =================
 

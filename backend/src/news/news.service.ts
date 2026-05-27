@@ -79,8 +79,9 @@ export class NewsService {
             this.cache = { data: result, timestamp: Date.now() };
 
             return result;
-        } catch (error) {
-            console.error('RSS Error:', error.message);
+        } catch (error: unknown) {
+            const err = error as { message?: string };
+            console.error('RSS Error:', err?.message || error);
             return {
                 status: 'error',
                 totalResults: 0,

@@ -24,10 +24,28 @@ export class UsersService {
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(createUserDto.password, salt);
 
-    // Remove plain password from object if needed, but here we just map to entity
     const user = this.usersRepository.create({
       ...createUserDto,
       passwordHash,
+      isActive: true,
+    });
+    return this.usersRepository.save(user);
+  }
+
+  async createGoogleUser(profile: {
+    email: string;
+    fullName: string;
+    avatar: string;
+    provider: string;
+    providerId: string;
+  }): Promise<User> {
+    const user = this.usersRepository.create({
+      email: profile.email,
+      fullName: profile.fullName,
+      avatar: profile.avatar,
+      provider: profile.provider,
+      providerId: profile.providerId,
+      role: UserRole.CUSTOMER,
       isActive: true,
     });
     return this.usersRepository.save(user);

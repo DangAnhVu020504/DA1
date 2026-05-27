@@ -30,8 +30,7 @@
             <div class="property-grid">
                 <div *ngFor="let prop of properties" class="property-card">
                     <div class="card-image-container" [routerLink]="['/properties', prop.id]" style="cursor: pointer;">
-                        <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/house-placeholder.jpg'"
-                            alt="Property Image" class="property-img">
+                        <img [src]="getImageUrl(prop.imageUrl)" alt="Property Image" class="property-img">
                         <button class="heart-btn" (click)="toggleLike(prop, $event)" [class.liked]="prop.liked">
                             ❤️
                         </button>

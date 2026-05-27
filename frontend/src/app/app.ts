@@ -5,11 +5,12 @@ import { AuthService } from './services/auth.service';
 import { AppointmentService, Appointment } from './services/appointment.service';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { ChatbotComponent } from './components/chatbot/chatbot.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ChatbotComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

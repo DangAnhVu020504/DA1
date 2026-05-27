@@ -18,7 +18,7 @@ export class User {
     @Column({ nullable: true })
     phone: string;
 
-    @Column({ name: 'password_hash' })
+    @Column({ name: 'password_hash', nullable: true })
     passwordHash: string;
 
     @Column({ name: 'full_name' })
@@ -39,6 +39,12 @@ export class User {
 
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
+
+    @Column({ default: 'local' })
+    provider: string;
+
+    @Column({ name: 'provider_id', nullable: true })
+    providerId: string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

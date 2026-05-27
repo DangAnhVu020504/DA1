@@ -5,8 +5,7 @@
         <h2>📅 Đặt lịch hẹn / Liên hệ</h2>
 
         <div *ngIf="property" class="property-summary">
-            <img [src]="property.imageUrl ? 'http://localhost:3000' + property.imageUrl : 'assets/house-placeholder.jpg'"
-                alt="Property">
+            <img [src]="getImageUrl(property.imageUrl)" alt="Property">
             <div>
                 <h3>{{ property.title }}</h3>
                 <p>{{ property.price | number }} VND</p>

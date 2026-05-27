@@ -81,4 +81,10 @@ export class AuthService {
     updateCurrentUser(user: User) {
         this.currentUserSubject.next(user);
     }
+
+    handleGoogleToken(token: string) {
+        localStorage.setItem('token', token);
+        this.isLoadingSubject.next(true);
+        this.loadUserFromToken();
+    }
 }

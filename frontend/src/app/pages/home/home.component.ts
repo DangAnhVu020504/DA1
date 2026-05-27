@@ -196,4 +196,13 @@ export class HomeComponent implements OnInit {
         this.sortOrder = 'DESC';
         this.loadProperties();
     }
+
+    // Helper function to get proper image URL (handles both local and external URLs)
+    getImageUrl(url: string | null | undefined): string {
+        if (!url) return 'assets/house-placeholder.jpg';
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        return 'http://localhost:3000' + url;
+    }
 }

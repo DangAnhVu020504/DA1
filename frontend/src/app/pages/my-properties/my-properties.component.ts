@@ -338,4 +338,13 @@ export class MyPropertiesComponent implements OnInit {
         };
         return labels[status] || status;
     }
+
+    // Helper function to get proper image URL (handles both local and external URLs)
+    getImageUrl(url: string | null | undefined): string {
+        if (!url) return 'assets/default-property.jpg';
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        return 'http://localhost:3000' + url;
+    }
 }

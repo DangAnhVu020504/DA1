@@ -1,4 +1,6 @@
-import { Controller, Request, Post, UseGuards, Body, Get } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Body, Get, Res } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -40,5 +42,15 @@ export class AuthController {
     ) {
         return this.authService.resetPassword(body.email, body.phone, body.newPassword);
     }
-}
 
+    @Get('google')
+    @UseGuards(AuthGuard('google'))
+    async googleAuth() {}
+
+    @Get('google/callback')
+    @UseGuards(AuthGuard('google'))
+    async googleAuthRedirect(@Request() req, @Res() res: Response) {
+        const result = await this.authService.validateGoogleUser(req.user);
+        res.redirect(`http://localhost:4200/login?token=${result.access_token}`);
+    }
+}

@@ -30,8 +30,7 @@
         <div *ngFor="let fav of filteredFavorites" class="property-card">
             <div class="card-image-container" [routerLink]="['/properties', getProperty(fav)?.id]"
                 style="cursor: pointer;">
-                <img [src]="getProperty(fav)?.imageUrl ? 'http://localhost:3000' + getProperty(fav)?.imageUrl : 'assets/house-placeholder.jpg'"
-                    alt="Property Image" class="property-img">
+                <img [src]="getImageUrl(getProperty(fav)?.imageUrl)" alt="Property Image" class="property-img">
                 <button class="heart-btn liked" (click)="removeFavorite(fav.propertyId, $event)" title="Bỏ yêu thích">
                     ❤️
                 </button>

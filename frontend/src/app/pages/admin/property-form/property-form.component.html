@@ -37,8 +37,8 @@
             <input type="file" (change)="onFilesSelected($event)" accept="image/*" multiple class="form-control-file">
 
             <!-- Existing Image Preview (Edit Mode) -->
-            <img *ngIf="property.imageUrl && imagePreviews.length === 0"
-                [src]="'http://localhost:3000' + property.imageUrl" class="preview-img">
+            <img *ngIf="property.imageUrl && imagePreviews.length === 0" [src]="getImageUrl(property.imageUrl)"
+                class="preview-img">
 
             <!-- New Images Preview Grid -->
             <div class="image-preview-grid" *ngIf="imagePreviews.length > 0">
@@ -57,7 +57,7 @@
 
             <!-- Existing Video Preview (Edit Mode) -->
             <div *ngIf="property.videoUrl" class="video-preview">
-                <video [src]="'http://localhost:3000' + property.videoUrl" controls width="200"></video>
+                <video [src]="getImageUrl(property.videoUrl)" controls width="200"></video>
             </div>
 
             <!-- New Video Selected -->

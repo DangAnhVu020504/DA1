@@ -21,8 +21,7 @@
             <tr *ngFor="let prop of properties" class="clickable-row">
                 <td>{{ prop.id }}</td>
                 <td (click)="viewPropertyDetail(prop.id!)" class="clickable">
-                    <img [src]="prop.imageUrl ? 'http://localhost:3000' + prop.imageUrl : 'assets/house-placeholder.jpg'"
-                        class="thumb-img" alt="Property">
+                    <img [src]="getImageUrl(prop.imageUrl)" class="thumb-img" alt="Property">
                 </td>
                 <td (click)="viewPropertyDetail(prop.id!)" class="clickable title-cell">{{ prop.title }}</td>
                 <td>

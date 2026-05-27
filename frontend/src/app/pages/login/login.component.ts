@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,11 +13,10 @@ import { HttpClient } from '@angular/common/http';
     templateUrl: './login.component.html',
     styleUrl: './login.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
     loginForm: FormGroup;
     errorMsg: string = '';
 
-    // Forgot Password
     showForgotPassword = false;
     isResetting = false;
     resetMessage = '';
@@ -32,11 +31,23 @@ export class LoginComponent {
         private fb: FormBuilder,
         private authService: AuthService,
         private router: Router,
+        private route: ActivatedRoute,
         private http: HttpClient
     ) {
         this.loginForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required]]
+        });
+    }
+
+    ngOnInit() {
+        this.route.queryParams.subscribe(params => {
+            const token = params['token'];
+            if (token) {
+                localStorage.setItem('token', token);
+                this.authService.handleGoogleToken(token);
+                this.router.navigate(['/home']);
+            }
         });
     }
 
@@ -52,6 +63,10 @@ export class LoginComponent {
                 }
             });
         }
+    }
+
+    loginWithGoogle() {
+        window.location.href = 'http://localhost:3000/auth/google';
     }
 
     toggleForgotPassword() {
@@ -70,25 +85,21 @@ export class LoginComponent {
     resetPassword() {
         this.resetMessage = '';
 
-        // Validate email
         if (!this.forgotData.email || !this.forgotData.email.includes('@')) {
             this.resetMessage = '❌ Vui lòng nhập email hợp lệ!';
             return;
         }
 
-        // Validate phone
         if (!this.forgotData.phone) {
             this.resetMessage = '❌ Vui lòng nhập số điện thoại!';
             return;
         }
 
-        // Validate new password
         if (!this.forgotData.newPassword || this.forgotData.newPassword.length < 6) {
             this.resetMessage = '❌ Mật khẩu mới phải có ít nhất 6 ký tự!';
             return;
         }
 
-        // Validate confirm password
         if (this.forgotData.newPassword !== this.forgotData.confirmPassword) {
             this.resetMessage = '❌ Xác nhận mật khẩu không khớp!';
             return;
@@ -119,4 +130,3 @@ export class LoginComponent {
         });
     }
 }
-
