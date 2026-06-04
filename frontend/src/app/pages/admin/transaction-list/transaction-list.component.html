@@ -1,0 +1,93 @@
+<div class="admin-list-container">
+    <h2>💰 Quản lý Giao dịch</h2>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid" *ngIf="statistics">
+        <div class="stat-card total">
+            <div class="stat-icon">📊</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ statistics.total }}</span>
+                <span class="stat-label">Tổng giao dịch</span>
+            </div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ statistics.success }}</span>
+                <span class="stat-label">Thành công</span>
+            </div>
+        </div>
+        <div class="stat-card pending">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ statistics.pending }}</span>
+                <span class="stat-label">Đang chờ</span>
+            </div>
+        </div>
+        <div class="stat-card revenue">
+            <div class="stat-icon">💵</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ formatPrice(statistics.totalRevenue) }}</span>
+                <span class="stat-label">Doanh thu</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-bar">
+        <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Đang chờ</option>
+            <option value="success">Thành công</option>
+            <option value="failed">Thất bại</option>
+            <option value="cancelled">Đã hủy</option>
+        </select>
+        <span class="total-count">Tổng: {{ totalItems }} giao dịch</span>
+    </div>
+
+    <!-- Table -->
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Mã GD</th>
+                <th>Người dùng</th>
+                <th>Số tiền</th>
+                <th>Phương thức</th>
+                <th>Mô tả</th>
+                <th>Trạng thái</th>
+                <th>Thời gian</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let txn of transactions">
+                <td>{{ txn.id }}</td>
+                <td class="ref-cell">{{ txn.transactionRef || '-' }}</td>
+                <td>{{ txn.customer?.fullName || txn.customer?.email || 'N/A' }}</td>
+                <td class="amount-cell">{{ formatPrice(txn.amount) }}</td>
+                <td>
+                    <span class="method-badge" [class]="txn.paymentMethod">
+                        {{ getPaymentMethodLabel(txn.paymentMethod) }}
+                    </span>
+                </td>
+                <td class="info-cell">{{ txn.orderInfo || '-' }}</td>
+                <td>
+                    <span class="status-badge" [class]="txn.status">
+                        {{ getStatusLabel(txn.status) }}
+                    </span>
+                </td>
+                <td>{{ txn.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+            <tr *ngIf="transactions.length === 0">
+                <td colspan="8" class="no-data">Chưa có giao dịch nào</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" class="page-btn">◄</button>
+        <span class="page-info">Trang {{ currentPage }} / {{ totalPages }}</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" class="page-btn">►</button>
+    </div>
+</div>
