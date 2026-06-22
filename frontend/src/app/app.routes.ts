@@ -21,6 +21,7 @@ import { NewsComponent } from './pages/news/news.component';
 import { PaymentComponent } from './pages/payment/payment.component';
 import { PaymentResultComponent } from './pages/payment-result/payment-result.component';
 import { AdminTransactionListComponent } from './pages/admin/transaction-list/transaction-list.component';
+import { ChatComponent } from './pages/chat/chat.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -38,6 +39,7 @@ export const routes: Routes = [
     { path: 'news', component: NewsComponent, canActivate: [authGuard] },
     { path: 'payment', component: PaymentComponent, canActivate: [authGuard] },
     { path: 'payment-result', component: PaymentResultComponent, canActivate: [authGuard] },
+    { path: 'chat', component: ChatComponent, canActivate: [authGuard] },
     {
         path: 'admin',
         component: AdminComponent,

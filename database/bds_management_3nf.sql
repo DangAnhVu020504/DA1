@@ -1,8 +1,8 @@
 -- =====================================================
 -- DATABASE: bds_management_3nf
 -- Cơ sở dữ liệu chuẩn 3NF cho hệ thống BatDongSanVIP
--- Đã bổ sung các bảng cho chức năng: Bình luận, Avatar, Đặt lịch, Favorites
--- Cập nhật: 2025-12-28 - Thêm dữ liệu mẫu đầy đủ
+-- Đã bổ sung các bảng cho chức năng: Bình luận, Avatar, Đặt lịch, Favorites, Chat
+-- Cập nhật: 2026-06-22 - Thêm bảng Chat (conversations, messages)
 -- =====================================================
 
 CREATE DATABASE IF NOT EXISTS bds_management_3nf
@@ -194,6 +194,38 @@ CREATE TABLE transactions (
   
   CONSTRAINT fk_transactions_listing FOREIGN KEY (listing_id) REFERENCES listings(id),
   CONSTRAINT fk_transactions_customer FOREIGN KEY (customer_id) REFERENCES users(id)
+);
+
+-- ================= KHỐI CHAT (Real-time Messaging) =================
+
+-- Bảng Cuộc hội thoại 1-1 giữa buyer và seller về một property
+-- Mỗi cặp (property_id, buyer_id, seller_id) chỉ có 1 conversation duy nhất
+CREATE TABLE conversations (
+  id CHAR(36) NOT NULL PRIMARY KEY,           -- UUID
+  property_id INT NOT NULL,                   -- BĐS liên quan
+  seller_id INT NOT NULL,                     -- Người bán / chủ nhà
+  buyer_id INT NOT NULL,                      -- Người mua / liên hệ
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_conversations_property FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+  CONSTRAINT fk_conversations_seller   FOREIGN KEY (seller_id)   REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_conversations_buyer    FOREIGN KEY (buyer_id)    REFERENCES users(id) ON DELETE CASCADE,
+  -- Đảm bảo mỗi cặp buyer-seller-property chỉ có 1 cuộc hội thoại
+  CONSTRAINT uq_conversation UNIQUE (property_id, buyer_id, seller_id)
+);
+
+-- Bảng Tin nhắn (thuộc về conversation)
+CREATE TABLE messages (
+  id CHAR(36) NOT NULL PRIMARY KEY,           -- UUID
+  conversation_id CHAR(36) NOT NULL,          -- FK -> conversations
+  sender_id INT NOT NULL,                     -- Người gửi (buyer hoặc seller)
+  content TEXT NOT NULL,                      -- Nội dung tin nhắn
+  is_read TINYINT(1) NOT NULL DEFAULT 0,      -- Trạng thái đã đọc
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_messages_conversation FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
+  CONSTRAINT fk_messages_sender       FOREIGN KEY (sender_id)       REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- ================= DỮ LIỆU KHỞI TẠO - LOOKUP TABLES =================
@@ -466,6 +498,104 @@ INSERT INTO comments (content, user_id, listing_id) VALUES
 ('Đất view biển hiếm lắm, đáng để đầu tư.', 10, 11),
 ('Văn phòng Bitexco sang trọng, rất phù hợp cho công ty lớn.', 7, 12);
 
+-- ================= DỮ LIỆU MẪU - CONVERSATIONS & MESSAGES =================
+-- Kịch bản: buyer (customer) liên hệ seller (owner/agent) về các BĐS
+
+INSERT INTO conversations (id, property_id, seller_id, buyer_id, created_at, updated_at) VALUES
+-- CV1: Lê Văn C (id=4) hỏi Nguyễn Văn A (id=2) về căn hộ Vinhomes (property_id=1)
+('a1b2c3d4-0001-0001-0001-000000000001', 1, 2, 4, '2025-01-02 08:30:00', '2025-01-02 09:15:00'),
+-- CV2: Vũ Thị F (id=7) hỏi Nguyễn Văn A (id=2) về căn hộ Vinhomes (property_id=1)
+('a1b2c3d4-0002-0002-0002-000000000002', 1, 2, 7, '2025-01-03 10:00:00', '2025-01-03 10:45:00'),
+-- CV3: Lê Văn C (id=4) hỏi Nguyễn Văn A (id=2) về nhà phố Thảo Điền (property_id=2)
+('a1b2c3d4-0003-0003-0003-000000000003', 2, 2, 4, '2025-01-04 14:00:00', '2025-01-04 14:50:00'),
+-- CV4: Bùi Thị H (id=9) hỏi Phạm Thị D (id=5) về đất nền PMH (property_id=3)
+('a1b2c3d4-0004-0004-0004-000000000004', 3, 5, 9, '2025-01-05 09:00:00', '2025-01-05 09:30:00'),
+-- CV5: Ngô Thị I (id=10) hỏi Phạm Thị D (id=5) về biệt thự Villa Park (property_id=4)
+('a1b2c3d4-0005-0005-0005-000000000005', 4, 5, 10, '2025-01-06 11:00:00', '2025-01-06 11:40:00'),
+-- CV6: Lê Văn C (id=4) hỏi Trần Thị B (id=3) về căn hộ cho thuê City Garden (property_id=5)
+('a1b2c3d4-0006-0006-0006-000000000006', 5, 3, 4, '2025-01-07 16:00:00', '2025-01-07 16:20:00'),
+-- CV7: Bùi Thị H (id=9) hỏi Đặng Văn G (id=8) về căn hộ Lotte (property_id=7)
+('a1b2c3d4-0007-0007-0007-000000000007', 7, 8, 9, '2025-01-09 08:00:00', '2025-01-09 08:55:00'),
+-- CV8: Vũ Thị F (id=7) hỏi Vũ Thị F (id=6) về căn hộ Sunrise City (property_id=10)
+('a1b2c3d4-0008-0008-0008-000000000008', 10, 6, 7, '2025-01-11 13:00:00', '2025-01-11 13:30:00');
+
+INSERT INTO messages (id, conversation_id, sender_id, content, is_read, created_at) VALUES
+-- ---- Conversation 1: Lê Văn C hỏi về Vinhomes ----
+('m0000001-0000-0000-0000-000000000001', 'a1b2c3d4-0001-0001-0001-000000000001', 4,
+  'Chào anh, căn hộ Vinhomes Golden River này hiện còn không ạ? Em muốn hỏi thêm thông tin.', 1, '2025-01-02 08:30:00'),
+('m0000001-0000-0000-0000-000000000002', 'a1b2c3d4-0001-0001-0001-000000000001', 2,
+  'Chào em! Căn này vẫn còn, hiện tại đang trong trạng thái sẵn sàng. Em muốn hỏi về điều gì ạ?', 1, '2025-01-02 08:45:00'),
+('m0000001-0000-0000-0000-000000000003', 'a1b2c3d4-0001-0001-0001-000000000001', 4,
+  'Giá 12.5 tỷ có thể thương lượng không anh? Và căn có view sông không ạ?', 1, '2025-01-02 08:50:00'),
+('m0000001-0000-0000-0000-000000000004', 'a1b2c3d4-0001-0001-0001-000000000001', 2,
+  'Có view sông trực tiếp em ơi, tầng cao nên rất đẹp. Giá có thể thương lượng khoảng 5% nếu thiện chí. Anh có thể sắp xếp cho em xem nhà cuối tuần này không?', 1, '2025-01-02 09:00:00'),
+('m0000001-0000-0000-0000-000000000005', 'a1b2c3d4-0001-0001-0001-000000000001', 4,
+  'Vâng anh ơi, em muốn xem vào sáng thứ 7 tuần này được không ạ?', 1, '2025-01-02 09:15:00'),
+
+-- ---- Conversation 2: Vũ Thị F hỏi về Vinhomes ----
+('m0000002-0000-0000-0000-000000000001', 'a1b2c3d4-0002-0002-0002-000000000002', 7,
+  'Anh ơi, căn hộ này có nội thất đầy đủ chưa hay phải mua thêm ạ?', 1, '2025-01-03 10:00:00'),
+('m0000002-0000-0000-0000-000000000002', 'a1b2c3d4-0002-0002-0002-000000000002', 2,
+  'Căn này full nội thất cao cấp em nhé, tủ bếp Hafele, sofa nhập khẩu, thiết bị vệ sinh Kohler đầy đủ.', 1, '2025-01-03 10:20:00'),
+('m0000002-0000-0000-0000-000000000003', 'a1b2c3d4-0002-0002-0002-000000000002', 7,
+  'Phí quản lý hàng tháng khoảng bao nhiêu vậy anh?', 1, '2025-01-03 10:35:00'),
+('m0000002-0000-0000-0000-000000000004', 'a1b2c3d4-0002-0002-0002-000000000002', 2,
+  'Phí quản lý khoảng 25-30 triệu/tháng em ơi, bao gồm dịch vụ tòa nhà, bảo vệ 24/7, vệ sinh chung.', 0, '2025-01-03 10:45:00'),
+
+-- ---- Conversation 3: Lê Văn C hỏi về nhà phố Thảo Điền ----
+('m0000003-0000-0000-0000-000000000001', 'a1b2c3d4-0003-0003-0003-000000000003', 4,
+  'Chào anh, nhà phố Thảo Điền này sổ hồng chính chủ không ạ? Và có thể cho thuê lại không?', 1, '2025-01-04 14:00:00'),
+('m0000003-0000-0000-0000-000000000002', 'a1b2c3d4-0003-0003-0003-000000000003', 2,
+  'Sổ hồng chính chủ, sang tên được ngay em nhé. Nhà ở khu compound an ninh, nếu muốn cho thuê lại cũng ok, tầm 80-100 triệu/tháng.', 1, '2025-01-04 14:20:00'),
+('m0000003-0000-0000-0000-000000000003', 'a1b2c3d4-0003-0003-0003-000000000003', 4,
+  'Nhà đang có người ở không hay bỏ trống anh? Em muốn dọn vào ở ngay sau khi mua.', 1, '2025-01-04 14:35:00'),
+('m0000003-0000-0000-0000-000000000004', 'a1b2c3d4-0003-0003-0003-000000000003', 2,
+  'Nhà đang bỏ trống em ơi, dọn vào ngay được. Anh sẽ dọn dẹp sạch sẽ trước khi bàn giao.', 1, '2025-01-04 14:50:00'),
+
+-- ---- Conversation 4: Bùi Thị H hỏi về đất nền PMH ----
+('m0000004-0000-0000-0000-000000000001', 'a1b2c3d4-0004-0004-0004-000000000004', 9,
+  'Chị ơi, lô đất Phú Mỹ Hưng này đường trước mặt rộng bao nhiêu mét ạ?', 1, '2025-01-05 09:00:00'),
+('m0000004-0000-0000-0000-000000000002', 'a1b2c3d4-0004-0004-0004-000000000004', 5,
+  'Mặt tiền đường 20m em ơi, thuận lợi xây dựng. Hướng Đông đón nắng sáng rất tốt.', 1, '2025-01-05 09:15:00'),
+('m0000004-0000-0000-0000-000000000003', 'a1b2c3d4-0004-0004-0004-000000000004', 9,
+  'Giá có thể xuống 32 tỷ không chị? Em đang cân nhắc nhiều lô.', 0, '2025-01-05 09:30:00'),
+
+-- ---- Conversation 5: Ngô Thị I hỏi về biệt thự Villa Park ----
+('m0000005-0000-0000-0000-000000000001', 'a1b2c3d4-0005-0005-0005-000000000005', 10,
+  'Chị ơi, biệt thự Villa Park này có hồ bơi riêng không? Diện tích hồ bơi bao nhiêu ạ?', 1, '2025-01-06 11:00:00'),
+('m0000005-0000-0000-0000-000000000002', 'a1b2c3d4-0005-0005-0005-000000000005', 5,
+  'Có hồ bơi riêng em nhé, diện tích khoảng 40m2. Ngoài ra còn sân vườn rộng 200m2 rất thoáng.', 1, '2025-01-06 11:15:00'),
+('m0000005-0000-0000-0000-000000000003', 'a1b2c3d4-0005-0005-0005-000000000005', 10,
+  'Khu này có cho thuê không chị, em muốn thuê trước khi quyết định mua.', 1, '2025-01-06 11:30:00'),
+('m0000005-0000-0000-0000-000000000004', 'a1b2c3d4-0005-0005-0005-000000000005', 5,
+  'Chị có thể xem xét, giá thuê tầm 80 triệu/tháng. Nếu sau đó quyết định mua, tiền thuê có thể trừ vào giá mua nha em.', 0, '2025-01-06 11:40:00'),
+
+-- ---- Conversation 6: Lê Văn C hỏi về City Garden ----
+('m0000006-0000-0000-0000-000000000001', 'a1b2c3d4-0006-0006-0006-000000000006', 4,
+  'Chị ơi, căn hộ City Garden cho thuê có hợp đồng tối thiểu bao nhiêu tháng không ạ?', 1, '2025-01-07 16:00:00'),
+('m0000006-0000-0000-0000-000000000002', 'a1b2c3d4-0006-0006-0006-000000000006', 3,
+  'Tối thiểu 12 tháng em ơi. Giá 25 triệu/tháng đã bao gồm phí quản lý. Đặt cọc 2 tháng.', 1, '2025-01-07 16:10:00'),
+('m0000006-0000-0000-0000-000000000003', 'a1b2c3d4-0006-0006-0006-000000000006', 4,
+  'OK chị, em muốn xem nhà vào chiều thứ 6 này được không ạ?', 0, '2025-01-07 16:20:00'),
+
+-- ---- Conversation 7: Bùi Thị H hỏi về Lotte Center Hà Nội ----
+('m0000007-0000-0000-0000-000000000001', 'a1b2c3d4-0007-0007-0007-000000000007', 9,
+  'Anh ơi, căn hộ Lotte Center này diện tích thực tế là bao nhiêu? Trong bao gồm cả ban công không?', 1, '2025-01-09 08:00:00'),
+('m0000007-0000-0000-0000-000000000002', 'a1b2c3d4-0007-0007-0007-000000000007', 8,
+  '95m2 thực sử dụng em nhé, chưa tính ban công. Ban công thêm khoảng 8m2 nữa. View hồ Tây rất đẹp.', 1, '2025-01-09 08:20:00'),
+('m0000007-0000-0000-0000-000000000003', 'a1b2c3d4-0007-0007-0007-000000000007', 9,
+  'Tầng mấy vậy anh? Em muốn tầng cao một chút để có view tốt hơn.', 1, '2025-01-09 08:40:00'),
+('m0000007-0000-0000-0000-000000000004', 'a1b2c3d4-0007-0007-0007-000000000007', 8,
+  'Tầng 28 em ơi, thuộc tầng cao tòa nhà. View hồ Tây và cầu Nhật Tân rất rõ vào buổi sáng.', 1, '2025-01-09 08:55:00'),
+
+-- ---- Conversation 8: Vũ Thị F hỏi về Sunrise City Q7 ----
+('m0000008-0000-0000-0000-000000000001', 'a1b2c3d4-0008-0008-0008-000000000008', 7,
+  'Chị ơi, căn hộ Sunrise City có thể nhận chó mèo nuôi không ạ?', 1, '2025-01-11 13:00:00'),
+('m0000008-0000-0000-0000-000000000002', 'a1b2c3d4-0008-0008-0008-000000000008', 6,
+  'Dạ khu này có cho phép nuôi thú cưng nhỏ em nhé, cần đăng ký với ban quản lý tòa nhà.', 1, '2025-01-11 13:15:00'),
+('m0000008-0000-0000-0000-000000000003', 'a1b2c3d4-0008-0008-0008-000000000008', 7,
+  'Vậy giá thuê 18 triệu có bao gồm chỗ giữ xe ô tô không ạ?', 0, '2025-01-11 13:30:00');
+
 -- ================= INDEXES =================
 
 CREATE INDEX idx_properties_owner ON properties(owner_id);
@@ -487,9 +617,19 @@ CREATE INDEX idx_appointments_date ON appointments(scheduled_at);
 CREATE INDEX idx_favorites_user ON favorites(user_id);
 CREATE INDEX idx_favorites_property ON favorites(property_id);
 
+CREATE INDEX idx_conversations_property ON conversations(property_id);
+CREATE INDEX idx_conversations_seller ON conversations(seller_id);
+CREATE INDEX idx_conversations_buyer ON conversations(buyer_id);
+CREATE INDEX idx_conversations_updated ON conversations(updated_at);
+
+CREATE INDEX idx_messages_conversation ON messages(conversation_id);
+CREATE INDEX idx_messages_sender ON messages(sender_id);
+CREATE INDEX idx_messages_is_read ON messages(is_read);
+CREATE INDEX idx_messages_created ON messages(created_at);
+
 -- ================= THỐNG KÊ DỮ LIỆU =================
 -- Users: 10 bản ghi
--- Cities: 10 bản ghi  
+-- Cities: 10 bản ghi
 -- Districts: 25 bản ghi
 -- Property Types: 10 bản ghi
 -- Listing Types: 2 bản ghi
@@ -501,6 +641,8 @@ CREATE INDEX idx_favorites_property ON favorites(property_id);
 -- Favorites: 15 bản ghi
 -- Appointments: 12 bản ghi
 -- Comments: 15 bản ghi
+-- Conversations: 8 bản ghi
+-- Messages: 30 bản ghi
 -- =====================================================
 -- END OF DATABASE SCRIPT
 -- =====================================================

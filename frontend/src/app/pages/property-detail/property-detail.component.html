@@ -54,6 +54,10 @@
                     <button [routerLink]="['/booking', property.id]" class="btn-booking-detail">
                         📅 Đặt lịch hẹn / Liên hệ
                     </button>
+                    <!-- Nút Chat với người bán — ẩn nếu user là chủ property -->
+                    <button *ngIf="isLoggedIn() && !isOwner()" (click)="chatWithSeller()" class="btn-chat-seller">
+                        💬 Chat với người bán
+                    </button>
                 </div>
 
                 <div class="description-section">

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterLink, RouterModule, Router } from '@angular/router';
 import { PropertyService, Property } from '../../services/property.service';
 import { CommentService, Comment } from '../../services/comment.service';
 import { AuthService } from '../../services/auth.service';
@@ -20,6 +20,7 @@ export class PropertyDetailComponent implements OnInit {
     loading = true;
     error = '';
     propertyId: number | null = null;
+    currentUser: any = null;
 
     // Image gallery
     currentImageIndex = 0;
@@ -32,12 +33,18 @@ export class PropertyDetailComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
         private propertyService: PropertyService,
         private commentService: CommentService,
         private authService: AuthService
     ) { }
 
     ngOnInit(): void {
+        // Lấy thông tin user hiện tại
+        this.authService.currentUser$.subscribe(user => {
+            this.currentUser = user;
+        });
+
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
             this.propertyId = +id;
@@ -105,6 +112,33 @@ export class PropertyDetailComponent implements OnInit {
         return this.authService.isLoggedIn();
     }
 
+    /**
+     * Kiểm tra xem user hiện tại có phải là chủ property hay không.
+     * Nếu đúng → ẩn nút "Chat với người bán".
+     */
+    isOwner(): boolean {
+        if (!this.currentUser || !this.property) return false;
+        const ownerId = this.property.owner?.id || this.property.user?.id;
+        return this.currentUser.id === ownerId;
+    }
+
+    /**
+     * Chuyển hướng sang trang Chat và tự động khởi tạo/mở cuộc hội thoại
+     * với người bán (chủ property) về BĐS hiện tại.
+     */
+    chatWithSeller(): void {
+        if (!this.property || !this.isLoggedIn()) return;
+        const sellerId = this.property.owner?.id || this.property.user?.id;
+        if (!sellerId || !this.propertyId) return;
+
+        this.router.navigate(['/chat'], {
+            queryParams: {
+                propertyId: this.propertyId,
+                sellerId: sellerId,
+            },
+        });
+    }
+
     submitComment() {
         // Clear previous messages
         this.commentError = '';
@@ -151,4 +185,3 @@ export class PropertyDetailComponent implements OnInit {
         return 'http://localhost:3000' + url;
     }
 }
-

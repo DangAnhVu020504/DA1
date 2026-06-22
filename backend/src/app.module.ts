@@ -18,6 +18,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { NewsModule } from './news/news.module';
 import { AiModule } from './ai/ai.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     NewsModule,
     AiModule,
     TransactionsModule,
+    ChatModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',

@@ -1,0 +1,149 @@
+<div class="chat-container">
+  <!-- ==================== SIDEBAR: Danh sách Conversations ==================== -->
+  <div class="chat-sidebar">
+    <div class="sidebar-header">
+      <h2>💬 Tin nhắn</h2>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loadingConversations" class="sidebar-loading">
+      <div class="spinner"></div>
+      <p>Đang tải...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loadingConversations && conversations.length === 0" class="sidebar-empty">
+      <span class="empty-icon">💭</span>
+      <p>Chưa có cuộc trò chuyện nào</p>
+      <small>Hãy vào trang chi tiết BĐS và nhấn "Chat với người bán" để bắt đầu</small>
+    </div>
+
+    <!-- Danh sách conversations -->
+    <div class="conversation-list">
+      <div
+        *ngFor="let conv of conversations"
+        class="conversation-item"
+        [class.active]="selectedConversation?.id === conv.id"
+        [class.unread]="conv.unreadCount > 0"
+        (click)="selectConversation(conv)"
+      >
+        <div class="conv-avatar">
+          <img [src]="getChatPartnerAvatar(conv)" alt="Avatar" />
+        </div>
+        <div class="conv-info">
+          <div class="conv-header">
+            <span class="conv-name">{{ getChatPartnerName(conv) }}</span>
+            <span class="conv-time" *ngIf="conv.lastMessage">
+              {{ conv.lastMessage.createdAt | date: 'HH:mm' }}
+            </span>
+          </div>
+          <div class="conv-property">🏠 {{ getPropertyTitle(conv) }}</div>
+          <div class="conv-last-message">
+            {{ getLastMessagePreview(conv) }}
+          </div>
+        </div>
+        <div class="conv-badge" *ngIf="conv.unreadCount > 0">
+          {{ conv.unreadCount }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN: Khung Chat Chi Tiết ==================== -->
+  <div class="chat-main">
+    <!-- Chưa chọn conversation -->
+    <div *ngIf="!selectedConversation" class="chat-placeholder">
+      <div class="placeholder-content">
+        <span class="placeholder-icon">💬</span>
+        <h3>Chọn một cuộc trò chuyện</h3>
+        <p>Chọn cuộc trò chuyện từ danh sách bên trái để bắt đầu nhắn tin</p>
+      </div>
+    </div>
+
+    <!-- Conversation đang chọn -->
+    <div *ngIf="selectedConversation" class="chat-active">
+      <!-- Chat header: thông tin người chat -->
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <img
+            class="chat-header-avatar"
+            [src]="getChatPartnerAvatar(selectedConversation)"
+            alt="Avatar"
+          />
+          <div>
+            <h3 class="chat-header-name">
+              {{ getChatPartnerName(selectedConversation) }}
+            </h3>
+            <span class="chat-header-property">
+              🏠 {{ getPropertyTitle(selectedConversation) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages area -->
+      <div class="chat-messages" #messagesContainer>
+        <!-- Loading messages -->
+        <div *ngIf="loadingMessages" class="messages-loading">
+          <div class="spinner"></div>
+          <p>Đang tải tin nhắn...</p>
+        </div>
+
+        <!-- Empty messages -->
+        <div
+          *ngIf="!loadingMessages && messages.length === 0"
+          class="messages-empty"
+        >
+          <span class="empty-icon">👋</span>
+          <p>Bắt đầu cuộc trò chuyện!</p>
+          <small>Gửi tin nhắn đầu tiên để kết nối</small>
+        </div>
+
+        <!-- Message list -->
+        <div
+          *ngFor="let msg of messages"
+          class="message-wrapper"
+          [class.sent]="isMyMessage(msg)"
+          [class.received]="!isMyMessage(msg)"
+        >
+          <img
+            *ngIf="!isMyMessage(msg)"
+            class="message-avatar"
+            [src]="getChatPartnerAvatar(selectedConversation)"
+            alt="Avatar"
+          />
+          <div class="message-bubble">
+            <p class="message-content">{{ msg.content }}</p>
+            <span class="message-time">
+              {{ msg.createdAt | date: 'HH:mm' }}
+              <span *ngIf="isMyMessage(msg)" class="read-status">
+                {{ msg.isRead ? '✓✓' : '✓' }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input area -->
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <textarea
+            [(ngModel)]="newMessage"
+            placeholder="Nhập tin nhắn..."
+            rows="1"
+            (keydown)="onKeyDown($event)"
+            class="chat-input"
+          ></textarea>
+          <button
+            class="send-btn"
+            (click)="sendMessage()"
+            [disabled]="!newMessage.trim()"
+            title="Gửi tin nhắn"
+          >
+            <span class="send-icon">➤</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
