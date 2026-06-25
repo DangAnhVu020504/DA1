@@ -18,9 +18,6 @@ import { MyPropertiesComponent } from './pages/my-properties/my-properties.compo
 import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { MyAppointmentsComponent } from './pages/my-appointments/my-appointments.component';
 import { NewsComponent } from './pages/news/news.component';
-import { PaymentComponent } from './pages/payment/payment.component';
-import { PaymentResultComponent } from './pages/payment-result/payment-result.component';
-import { AdminTransactionListComponent } from './pages/admin/transaction-list/transaction-list.component';
 import { ChatComponent } from './pages/chat/chat.component';
 import { authGuard } from './guards/auth.guard';
 
@@ -37,8 +34,6 @@ export const routes: Routes = [
     { path: 'favorites', component: FavoritesComponent, canActivate: [authGuard] },
     { path: 'my-appointments', component: MyAppointmentsComponent, canActivate: [authGuard] },
     { path: 'news', component: NewsComponent, canActivate: [authGuard] },
-    { path: 'payment', component: PaymentComponent, canActivate: [authGuard] },
-    { path: 'payment-result', component: PaymentResultComponent, canActivate: [authGuard] },
     { path: 'chat', component: ChatComponent, canActivate: [authGuard] },
     {
         path: 'admin',
@@ -97,12 +92,6 @@ export const routes: Routes = [
     {
         path: 'admin/appointments',
         component: AdminAppointmentListComponent,
-        canActivate: [authGuard],
-        data: { role: 'admin' }
-    },
-    {
-        path: 'admin/transactions',
-        component: AdminTransactionListComponent,
         canActivate: [authGuard],
         data: { role: 'admin' }
     },

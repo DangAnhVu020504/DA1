@@ -31,6 +31,12 @@
                         Trình duyệt của bạn không hỗ trợ video.
                     </video>
                 </div>
+
+                <!-- Map Section — Hiển thị vị trí BĐS trên bản đồ -->
+                <div class="map-section" *ngIf="property.latitude && property.longitude">
+                    <h3>📍 Vị trí trên bản đồ</h3>
+                    <div id="detail-map" class="leaflet-map-container"></div>
+                </div>
             </div>
 
             <div class="info-section">
@@ -80,11 +86,7 @@
                     </div>
                 </div>
 
-                <!-- Map Section — Hiển thị vị trí BĐS trên bản đồ -->
-                <div class="map-section" *ngIf="property.latitude && property.longitude">
-                    <h3>📍 Vị trí trên bản đồ</h3>
-                    <div id="detail-map" class="leaflet-map-container"></div>
-                </div>
+
 
                 <!-- Comments Section -->
                 <div class="comments-section">

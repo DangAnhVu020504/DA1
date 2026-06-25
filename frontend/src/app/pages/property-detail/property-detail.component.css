@@ -50,8 +50,8 @@
     }
 }
 
-/* Main Image Section */
-.left-section {
+/* Main Image Section (Left Column) */
+.image-section {
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -59,6 +59,7 @@
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.5);
+    height: fit-content;
 }
 
 .main-image {
@@ -562,16 +563,13 @@
 }
 
 /* ============================================
-   Map Section — Vị trí BĐS trên bản đồ
+   Map Section — Vị trí BĐS trên bản đồ (nằm dưới hình ảnh, cột trái)
    ============================================ */
 .map-section {
-    margin-bottom: 2rem;
+    margin: 0;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+    border-top: 1px solid #e5e7eb;
 }
 
 .map-section h3 {
