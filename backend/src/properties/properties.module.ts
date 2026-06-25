@@ -13,4 +13,3 @@ import { Listing } from '../listings/entities/listing.entity';
     providers: [PropertiesService],
 })
 export class PropertiesModule { }
-

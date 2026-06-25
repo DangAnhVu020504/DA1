@@ -148,3 +148,89 @@
     margin-top: 6px;
     display: block;
 }
+
+/* ============================================
+   Map Section — Chọn vị trí BĐS
+   ============================================ */
+.leaflet-map-container {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    margin-top: 8px;
+    cursor: crosshair;
+    z-index: 1;
+}
+
+.latlng-display {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
+    font-size: 0.9rem;
+    color: #15803d;
+}
+
+.latlng-display strong {
+    color: #166534;
+}
+
+/* ============================================
+   Address Geocoding — Tìm vị trí từ địa chỉ
+   ============================================ */
+.address-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.address-input-group .form-control {
+    flex: 1;
+}
+
+.btn-geocode {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-geocode:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-geocode:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.geocode-hint {
+    color: #6366f1;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    display: block;
+    font-weight: 500;
+}
+
+.geocode-error {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    color: #b91c1c;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #fecaca;
+}

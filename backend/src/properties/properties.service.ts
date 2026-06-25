@@ -63,6 +63,9 @@ export class PropertiesService {
             direction: createPropertyDto.direction,
             legalStatus: createPropertyDto.legalStatus,
             status: createPropertyDto.status || 'available',
+            // Tọa độ bản đồ (có thể null)
+            latitude: createPropertyDto.latitude || null,
+            longitude: createPropertyDto.longitude || null,
             owner: user,
             propertyType: { id: createPropertyDto.typeId } as any,
             district: { id: createPropertyDto.districtId } as any,

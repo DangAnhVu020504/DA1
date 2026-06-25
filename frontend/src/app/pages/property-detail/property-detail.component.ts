@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink, RouterModule, Router } from '@angular/router';
 import { PropertyService, Property } from '../../services/property.service';
 import { CommentService, Comment } from '../../services/comment.service';
 import { AuthService } from '../../services/auth.service';
+import * as L from 'leaflet';
 
 @Component({
     selector: 'app-property-detail',
@@ -13,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
     templateUrl: './property-detail.component.html',
     styleUrls: ['./property-detail.component.css']
 })
-export class PropertyDetailComponent implements OnInit {
+export class PropertyDetailComponent implements OnInit, AfterViewInit, OnDestroy {
     property: Property | null = null;
     comments: Comment[] = [];
     newComment = '';
@@ -30,6 +31,9 @@ export class PropertyDetailComponent implements OnInit {
     commentError = '';
     commentSuccess = '';
     submittingComment = false;
+
+    // Leaflet map instance — lưu reference để destroy khi component bị hủy
+    private map: L.Map | null = null;
 
     constructor(
         private route: ActivatedRoute,
@@ -56,6 +60,24 @@ export class PropertyDetailComponent implements OnInit {
         }
     }
 
+    /**
+     * ngAfterViewInit: DOM đã sẵn sàng, nhưng property data có thể chưa load xong.
+     * Bản đồ sẽ được khởi tạo sau khi loadProperty() hoàn tất (trong initMap).
+     */
+    ngAfterViewInit(): void {
+        // Map sẽ được init sau khi property data load xong
+    }
+
+    /**
+     * Dọn dẹp map khi component bị destroy để tránh memory leak.
+     */
+    ngOnDestroy(): void {
+        if (this.map) {
+            this.map.remove();
+            this.map = null;
+        }
+    }
+
     loadProperty() {
         if (this.propertyId) {
             this.propertyService.findOne(this.propertyId).subscribe({
@@ -69,6 +91,10 @@ export class PropertyDetailComponent implements OnInit {
                         this.currentImageUrl = data.imageUrl;
                     }
                     this.loading = false;
+
+                    // Khởi tạo bản đồ sau khi có dữ liệu property
+                    // Dùng setTimeout để đảm bảo DOM đã render xong *ngIf
+                    setTimeout(() => this.initMap(), 100);
                 },
                 error: (err) => {
                     this.error = 'Không thể tải thông tin bất động sản';
@@ -77,6 +103,52 @@ export class PropertyDetailComponent implements OnInit {
                 }
             });
         }
+    }
+
+    /**
+     * Khởi tạo bản đồ Leaflet hiển thị vị trí property.
+     * Chỉ hiển thị khi property có latitude & longitude hợp lệ.
+     */
+    private initMap(): void {
+        if (!this.property?.latitude || !this.property?.longitude) return;
+
+        const lat = Number(this.property.latitude);
+        const lng = Number(this.property.longitude);
+
+        // Kiểm tra tọa độ hợp lệ
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        // Tìm container DOM — nếu chưa có thì bỏ qua
+        const mapContainer = document.getElementById('detail-map');
+        if (!mapContainer) return;
+
+        // Fix icon mặc định của Leaflet bị lỗi path khi dùng với bundler
+        // Sử dụng CDN để không cần copy file icon thủ công
+        const iconDefault = L.icon({
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            tooltipAnchor: [16, -28],
+            shadowSize: [41, 41]
+        });
+        L.Marker.prototype.options.icon = iconDefault;
+
+        // Khởi tạo map tại tọa độ property, zoom level 15
+        this.map = L.map('detail-map').setView([lat, lng], 15);
+
+        // Thêm tile layer từ OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(this.map);
+
+        // Đặt Marker tại vị trí property
+        L.marker([lat, lng])
+            .addTo(this.map)
+            .bindPopup(`<b>${this.property.title}</b><br>${this.property.address}`)
+            .openPopup();
     }
 
     // Gallery navigation

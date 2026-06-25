@@ -86,6 +86,13 @@ export class Property {
     @Column({ default: 0 })
     views: number;
 
+    // Tọa độ địa lý cho bản đồ (nullable để tương thích dữ liệu cũ)
+    @Column('decimal', { precision: 10, scale: 7, nullable: true })
+    latitude: number;
+
+    @Column('decimal', { precision: 10, scale: 7, nullable: true })
+    longitude: number;
+
     @ManyToMany(() => Amenity)
     @JoinTable({
         name: 'property_amenities',

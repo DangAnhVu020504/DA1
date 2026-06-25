@@ -1,7 +1,21 @@
 <div class="home-container">
     <div class="header-actions">
         <h1 class="featured-title">⭐ Tin nổi bật</h1>
-        <button (click)="goToCreate()" class="btn-create">➕ Đăng Tin Mới</button>
+        <div class="header-right">
+            <button (click)="toggleMap()" class="btn-toggle-map">
+                {{ showMap ? '🗺️ Ẩn bản đồ' : '🗺️ Hiện bản đồ' }}
+            </button>
+            <button (click)="goToCreate()" class="btn-create">➕ Đăng Tin Mới</button>
+        </div>
+    </div>
+
+    <!-- Bản đồ tổng hợp — Hiển thị tất cả BĐS trên bản đồ -->
+    <div class="map-overview-section" *ngIf="showMap">
+        <div class="map-overview-header">
+            <h3>🗺️ Bản đồ bất động sản</h3>
+            <span class="map-count">{{ properties.length }} BĐS trên bản đồ</span>
+        </div>
+        <div id="overview-map" class="overview-map-container"></div>
     </div>
 
     <!-- Main Content Layout: Grid + Sidebar -->

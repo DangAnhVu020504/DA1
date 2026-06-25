@@ -24,7 +24,14 @@
 
         <div class="form-group">
             <label>Địa chỉ *</label>
-            <input type="text" [(ngModel)]="property.address" name="address" required class="form-control">
+            <div class="address-input-group">
+                <input type="text" [(ngModel)]="property.address" name="address" required class="form-control"
+                    placeholder="Số nhà, tên đường" (ngModelChange)="onAddressChange()">
+                <button type="button" class="btn-geocode" (click)="searchLocation()" [disabled]="geocoding || !property.address">
+                    {{ geocoding ? '⏳ Đang tìm...' : '🔍 Tìm vị trí' }}
+                </button>
+            </div>
+            <small class="geocode-hint">Nhập địa chỉ để tự động định vị trên bản đồ</small>
         </div>
 
         <div class="form-group">
@@ -62,6 +69,22 @@
 
             <!-- New Video Selected -->
             <small *ngIf="selectedVideoFile" class="text-muted">✅ Đã chọn video: {{ selectedVideoFile.name }}</small>
+        </div>
+
+        <!-- Map Section — Chọn vị trí trên bản đồ -->
+        <div class="form-group">
+            <label>📍 Vị trí trên bản đồ</label>
+            <div id="form-map" class="leaflet-map-container"></div>
+            <!-- Geocode error -->
+            <div class="geocode-error" *ngIf="geocodeError">
+                ⚠️ {{ geocodeError }}
+            </div>
+            <!-- Tọa độ đã chọn -->
+            <div class="latlng-display" *ngIf="property.latitude && property.longitude">
+                <span>📌 Vĩ độ: <strong>{{ property.latitude }}</strong></span>
+                <span>📌 Kinh độ: <strong>{{ property.longitude }}</strong></span>
+            </div>
+            <small class="text-muted" *ngIf="!property.latitude">Nhập địa chỉ ở trên hoặc click vào bản đồ để chọn vị trí</small>
         </div>
 
         <div class="actions">

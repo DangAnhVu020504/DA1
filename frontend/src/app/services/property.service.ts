@@ -28,6 +28,9 @@ export interface Property {
     amenities?: { id: number; name: string }[];
     liked?: boolean;
     type?: string; // Derived from listingType.code ('sale' or 'rent')
+    // Tọa độ bản đồ
+    latitude?: number;
+    longitude?: number;
 }
 
 export interface PaginatedResponse<T> {
