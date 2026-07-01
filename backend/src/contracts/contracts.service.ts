@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appointment } from '../appointments/entities/appointment.entity';
+import { User } from '../users/entities/user.entity';
 import { ContractDataDto } from './dto/contract-data.dto';
 
 @Injectable()
@@ -9,6 +10,8 @@ export class ContractsService {
   constructor(
     @InjectRepository(Appointment)
     private readonly appointmentRepo: Repository<Appointment>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
   /**
@@ -21,27 +24,29 @@ export class ContractsService {
    * @returns ContractDataDto - dữ liệu hợp đồng type-safe
    */
   async generateContractData(appointmentId: number): Promise<ContractDataDto> {
-    // Bước 1: Tìm appointment kèm tất cả relations cần thiết
+    // ─── Bước 1: Load appointment cùng toàn bộ chuỗi relations bằng findOne ───
+    // Dùng 'relations' option thay vì QueryBuilder để tránh alias conflict
+    // khi eager:true trên property.owner/propertyType/listingType bị double-join
     const appointment = await this.appointmentRepo.findOne({
       where: { id: appointmentId },
       relations: [
-        'listing',                          // Bảng listings
-        'listing.property',                 // Bảng properties
-        'listing.property.owner',           // Bảng users (chủ nhà)
-        'listing.property.propertyType',    // Bảng property_types
-        'listing.property.listingType',     // Bảng listing_types
-        'customer',                         // Bảng users (khách hàng)
+        'listing',
+        'listing.property',
+        'listing.property.owner',
+        'listing.property.propertyType',
+        'listing.property.listingType',
+        'customer',
       ],
     });
 
-    // Bước 2: Kiểm tra tồn tại
+    // ─── Bước 2: Kiểm tra tồn tại ───
     if (!appointment) {
       throw new NotFoundException(
         `Không tìm thấy lịch hẹn với ID: ${appointmentId}`,
       );
     }
 
-    // Bước 3: Chỉ cho phép tạo hợp đồng với lịch hẹn đã confirmed hoặc completed
+    // ─── Bước 3: Validate trạng thái ───
     const allowedStatuses = ['confirmed', 'completed'];
     if (!allowedStatuses.includes(appointment.status)) {
       throw new BadRequestException(
@@ -50,10 +55,9 @@ export class ContractsService {
       );
     }
 
-    // Bước 4: Trích xuất thông tin từ relations
+    // ─── Bước 4: Trích xuất property, owner và customer từ relations đã load ───
     const property = appointment.listing?.property;
     const owner = property?.owner;
-    const customer = appointment.customer;
 
     if (!property || !owner) {
       throw new NotFoundException(
@@ -61,25 +65,31 @@ export class ContractsService {
       );
     }
 
-    // Bước 5: Xây dựng DTO trả về
+    // ─── Bước 5: Customer đã được load qua relations, không cần query thêm ───
+    const customerFull = appointment.customer ?? null;
+
+    // Load đầy đủ thông tin owner từ userRepo (phòng hờ eager load thiếu field)
+    const ownerFull = await this.userRepo.findOne({ where: { id: owner.id } });
+
+    // ─── Bước 6: Xây dựng DTO trả về ───
     const contractData: ContractDataDto = {
       appointmentId: appointment.id,
 
-      // Bên A - Chủ nhà (Seller / Landlord)
+      // Bên A - Chủ nhà (Seller)
       seller: {
-        fullName: owner.fullName || '',
-        phone: owner.phone || '',
-        email: owner.email || '',
-        address: owner.address || '',
+        fullName: ownerFull?.fullName || owner.fullName || '',
+        phone: ownerFull?.phone || owner.phone || '',
+        email: ownerFull?.email || owner.email || '',
+        address: ownerFull?.address || '',
       },
 
-      // Bên B - Khách hàng (Buyer / Tenant)
-      // Ưu tiên thông tin từ bảng users, fallback sang thông tin trong appointment
+      // Bên B - Khách hàng (Buyer)
+      // Ưu tiên dữ liệu từ bảng users, fallback sang thông tin đăng ký trong appointment
       buyer: {
-        fullName: customer?.fullName || appointment.fullName || '',
-        phone: customer?.phone || appointment.phone || '',
-        email: customer?.email || '',
-        address: customer?.address || '',
+        fullName: customerFull?.fullName || appointment.fullName || '',
+        phone: customerFull?.phone || appointment.phone || '',
+        email: customerFull?.email || '',
+        address: customerFull?.address || '',
       },
 
       // Chi tiết bất động sản
@@ -92,8 +102,8 @@ export class ContractsService {
         bathrooms: property.bathrooms || 0,
         direction: property.direction || null,
         legalStatus: property.legalStatus || null,
-        propertyType: (property as any).propertyType?.name || '',
-        listingType: (property as any).listingType?.name || '',
+        propertyType: property.propertyType?.name || '',
+        listingType: property.listingType?.name || '',
       },
 
       // Ngày tháng
