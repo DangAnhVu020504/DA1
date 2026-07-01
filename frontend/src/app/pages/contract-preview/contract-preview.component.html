@@ -1,0 +1,251 @@
+<!-- ============================================================
+     TRANG XEM TRƯỚC HỢP ĐỒNG BẤT ĐỘNG SẢN
+     ============================================================ -->
+<div class="contract-page">
+
+  <!-- ===== Thanh công cụ phía trên ===== -->
+  <div class="toolbar">
+    <a routerLink="/my-appointments" class="btn-back">
+      ← Quay lại lịch hẹn
+    </a>
+    <div class="toolbar-actions">
+      <button
+        class="btn-export"
+        (click)="exportToPDF()"
+        [disabled]="exporting || !contractData"
+      >
+        <span *ngIf="!exporting">📄 Xuất PDF</span>
+        <span *ngIf="exporting">⏳ Đang xuất...</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Trạng thái Loading ===== -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Đang tải dữ liệu hợp đồng...</p>
+  </div>
+
+  <!-- ===== Trạng thái Lỗi ===== -->
+  <div *ngIf="errorMessage && !loading" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h2>Không thể tải hợp đồng</h2>
+    <p>{{ errorMessage }}</p>
+    <a routerLink="/my-appointments" class="btn-back-alt">Quay lại</a>
+  </div>
+
+  <!-- ===== NỘI DUNG HỢP ĐỒNG - Template A4 ===== -->
+  <!-- Thẻ div này sẽ được html2canvas chụp lại để xuất PDF -->
+  <div
+    *ngIf="contractData && !loading"
+    class="contract-wrapper"
+    #contractContent
+  >
+    <div class="contract-paper">
+
+      <!-- ========== QUỐC HIỆU ========== -->
+      <div class="quoc-hieu">
+        <div class="quoc-hieu-line1">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+        <div class="quoc-hieu-line2">Độc lập – Tự do – Hạnh phúc</div>
+        <div class="quoc-hieu-divider">─────────✦─────────</div>
+      </div>
+
+      <!-- ========== TIÊU ĐỀ HỢP ĐỒNG ========== -->
+      <div class="contract-title">
+        <h1>HỢP ĐỒNG ĐẶT CỌC / THUÊ BẤT ĐỘNG SẢN</h1>
+        <p class="contract-number">
+          Số: HD-{{ contractData.appointmentId }}/{{ getYear() }}
+        </p>
+      </div>
+
+      <!-- ========== CĂN CỨ PHÁP LÝ ========== -->
+      <div class="legal-basis">
+        <p><strong>Căn cứ:</strong></p>
+        <ul>
+          <li>Bộ luật Dân sự 2015 (Luật số 91/2015/QH13);</li>
+          <li>Luật Nhà ở 2023 (Luật số 27/2023/QH15);</li>
+          <li>Luật Kinh doanh Bất động sản 2023 (Luật số 29/2023/QH15);</li>
+          <li>Sự thỏa thuận tự nguyện giữa hai bên.</li>
+        </ul>
+      </div>
+
+      <p class="intro-text">
+        Hôm nay, ngày {{ getDay() }} tháng {{ getMonth() }} năm {{ getYear() }},
+        tại địa chỉ bất động sản bên dưới, chúng tôi gồm:
+      </p>
+
+      <!-- ========== BÊN A - CHỦ NHÀ ========== -->
+      <div class="party-section">
+        <h2>BÊN A (Bên cho thuê / Bên bán):</h2>
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">Họ và tên:</td>
+            <td class="value-cell"><strong>{{ contractData.seller.fullName }}</strong></td>
+          </tr>
+          <tr>
+            <td class="label-cell">Số điện thoại:</td>
+            <td class="value-cell">{{ contractData.seller.phone || 'Chưa cung cấp' }}</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Email:</td>
+            <td class="value-cell">{{ contractData.seller.email || 'Chưa cung cấp' }}</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Địa chỉ:</td>
+            <td class="value-cell">{{ contractData.seller.address || 'Chưa cung cấp' }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- ========== BÊN B - KHÁCH HÀNG ========== -->
+      <div class="party-section">
+        <h2>BÊN B (Bên thuê / Bên mua):</h2>
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">Họ và tên:</td>
+            <td class="value-cell"><strong>{{ contractData.buyer.fullName }}</strong></td>
+          </tr>
+          <tr>
+            <td class="label-cell">Số điện thoại:</td>
+            <td class="value-cell">{{ contractData.buyer.phone || 'Chưa cung cấp' }}</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Email:</td>
+            <td class="value-cell">{{ contractData.buyer.email || 'Chưa cung cấp' }}</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Địa chỉ:</td>
+            <td class="value-cell">{{ contractData.buyer.address || 'Chưa cung cấp' }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p class="agreement-text">
+        Hai bên cùng thỏa thuận và đồng ý ký kết hợp đồng với các điều khoản sau:
+      </p>
+
+      <!-- ========== ĐIỀU 1: THÔNG TIN BĐS ========== -->
+      <div class="article-section">
+        <h3>Điều 1: Thông tin Bất động sản</h3>
+        <table class="info-table property-table">
+          <tr>
+            <td class="label-cell">Tên bất động sản:</td>
+            <td class="value-cell"><strong>{{ contractData.property.title }}</strong></td>
+          </tr>
+          <tr>
+            <td class="label-cell">Địa chỉ:</td>
+            <td class="value-cell">{{ contractData.property.address }}</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Loại bất động sản:</td>
+            <td class="value-cell">{{ contractData.property.propertyType || 'Không xác định' }}</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Hình thức:</td>
+            <td class="value-cell">{{ contractData.property.listingType || 'Không xác định' }}</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Diện tích:</td>
+            <td class="value-cell">{{ contractData.property.area }} m²</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Số phòng ngủ:</td>
+            <td class="value-cell">{{ contractData.property.bedrooms }} phòng</td>
+          </tr>
+          <tr>
+            <td class="label-cell">Số phòng tắm:</td>
+            <td class="value-cell">{{ contractData.property.bathrooms }} phòng</td>
+          </tr>
+          <tr *ngIf="contractData.property.direction">
+            <td class="label-cell">Hướng nhà:</td>
+            <td class="value-cell">{{ contractData.property.direction }}</td>
+          </tr>
+          <tr *ngIf="contractData.property.legalStatus">
+            <td class="label-cell">Tình trạng pháp lý:</td>
+            <td class="value-cell">{{ contractData.property.legalStatus }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- ========== ĐIỀU 2: GIÁ CẢ VÀ PHƯƠNG THỨC THANH TOÁN ========== -->
+      <div class="article-section">
+        <h3>Điều 2: Giá cả và phương thức thanh toán</h3>
+        <table class="info-table">
+          <tr>
+            <td class="label-cell">Giá trị hợp đồng:</td>
+            <td class="value-cell price-value">
+              <strong>{{ formatPrice(contractData.property.price) }}</strong>
+            </td>
+          </tr>
+          <tr>
+            <td class="label-cell">Bằng chữ:</td>
+            <td class="value-cell"><em>({{ priceInWords(contractData.property.price) }})</em></td>
+          </tr>
+        </table>
+        <div class="article-content">
+          <p>2.1. Bên B đồng ý đặt cọc cho Bên A số tiền tương đương <strong>10%</strong> giá trị hợp đồng,
+          tức <strong>{{ formatPrice(contractData.property.price * 0.1) }}</strong> (bằng chữ: {{ priceInWords(contractData.property.price * 0.1) }}).</p>
+          <p>2.2. Phương thức thanh toán: Chuyển khoản ngân hàng hoặc tiền mặt theo thỏa thuận.</p>
+          <p>2.3. Thời hạn thanh toán phần còn lại: Trong vòng 30 ngày kể từ ngày ký hợp đồng.</p>
+        </div>
+      </div>
+
+      <!-- ========== ĐIỀU 3: QUYỀN VÀ NGHĨA VỤ BÊN A ========== -->
+      <div class="article-section">
+        <h3>Điều 3: Quyền và nghĩa vụ của Bên A</h3>
+        <div class="article-content">
+          <p>3.1. Bên A cam kết bất động sản nêu trên thuộc quyền sở hữu hợp pháp, không có tranh chấp,
+          không bị kê biên để thi hành án.</p>
+          <p>3.2. Bên A có trách nhiệm bàn giao bất động sản đúng hiện trạng và thời hạn thỏa thuận.</p>
+          <p>3.3. Bên A cung cấp đầy đủ giấy tờ pháp lý liên quan đến bất động sản khi được yêu cầu.</p>
+        </div>
+      </div>
+
+      <!-- ========== ĐIỀU 4: QUYỀN VÀ NGHĨA VỤ BÊN B ========== -->
+      <div class="article-section">
+        <h3>Điều 4: Quyền và nghĩa vụ của Bên B</h3>
+        <div class="article-content">
+          <p>4.1. Bên B có quyền kiểm tra tình trạng thực tế của bất động sản trước khi nhận bàn giao.</p>
+          <p>4.2. Bên B có nghĩa vụ thanh toán đầy đủ và đúng hạn theo Điều 2 của hợp đồng.</p>
+          <p>4.3. Bên B sử dụng bất động sản đúng mục đích và tuân thủ quy định pháp luật.</p>
+        </div>
+      </div>
+
+      <!-- ========== ĐIỀU 5: ĐIỀU KHOẢN CHUNG ========== -->
+      <div class="article-section">
+        <h3>Điều 5: Điều khoản chung</h3>
+        <div class="article-content">
+          <p>5.1. Hợp đồng này có hiệu lực kể từ ngày ký.</p>
+          <p>5.2. Hai bên cam kết thực hiện đúng và đầy đủ các điều khoản đã thỏa thuận.
+          Bên nào vi phạm sẽ chịu trách nhiệm bồi thường thiệt hại.</p>
+          <p>5.3. Mọi tranh chấp phát sinh sẽ được giải quyết thông qua thương lượng.
+          Nếu không đạt được thỏa thuận, sẽ đưa ra Tòa án nhân dân có thẩm quyền giải quyết.</p>
+          <p>5.4. Hợp đồng được lập thành 02 (hai) bản có giá trị pháp lý như nhau,
+          mỗi bên giữ 01 (một) bản.</p>
+        </div>
+      </div>
+
+      <!-- ========== KHU VỰC CHỮ KÝ ========== -->
+      <div class="signature-section">
+        <div class="signature-date">
+          <em>Ngày {{ getDay() }} tháng {{ getMonth() }} năm {{ getYear() }}</em>
+        </div>
+        <div class="signature-row">
+          <div class="signature-block">
+            <h4>BÊN A</h4>
+            <p class="sign-note">(Ký và ghi rõ họ tên)</p>
+            <div class="sign-space"></div>
+            <p class="sign-name">{{ contractData.seller.fullName }}</p>
+          </div>
+          <div class="signature-block">
+            <h4>BÊN B</h4>
+            <p class="sign-note">(Ký và ghi rõ họ tên)</p>
+            <div class="sign-space"></div>
+            <p class="sign-name">{{ contractData.buyer.fullName }}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

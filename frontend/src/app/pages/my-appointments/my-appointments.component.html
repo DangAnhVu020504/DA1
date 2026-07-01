@@ -71,6 +71,12 @@
                         ❌ Từ chối
                     </button>
                 </div>
+                <!-- Nút tạo hợp đồng - chỉ hiện khi trạng thái confirmed hoặc completed -->
+                <div class="card-actions contract-actions" *ngIf="apt.status === 'confirmed' || apt.status === 'completed'">
+                    <a [routerLink]="['/contract-preview', apt.id]" class="btn-contract">
+                        📝 Tạo hợp đồng đặt cọc / thuê
+                    </a>
+                </div>
             </div>
         </div>
 

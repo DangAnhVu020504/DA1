@@ -19,6 +19,7 @@ import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { MyAppointmentsComponent } from './pages/my-appointments/my-appointments.component';
 import { NewsComponent } from './pages/news/news.component';
 import { ChatComponent } from './pages/chat/chat.component';
+import { ContractPreviewComponent } from './pages/contract-preview/contract-preview.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -35,6 +36,7 @@ export const routes: Routes = [
     { path: 'my-appointments', component: MyAppointmentsComponent, canActivate: [authGuard] },
     { path: 'news', component: NewsComponent, canActivate: [authGuard] },
     { path: 'chat', component: ChatComponent, canActivate: [authGuard] },
+    { path: 'contract-preview/:appointmentId', component: ContractPreviewComponent, canActivate: [authGuard] },
     {
         path: 'admin',
         component: AdminComponent,

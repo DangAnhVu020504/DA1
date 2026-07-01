@@ -19,6 +19,7 @@ import { NewsModule } from './news/news.module';
 import { AiModule } from './ai/ai.module';
 
 import { ChatModule } from './chat/chat.module';
+import { ContractsModule } from './contracts/contracts.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ChatModule } from './chat/chat.module';
     AiModule,
 
     ChatModule,
+    ContractsModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
